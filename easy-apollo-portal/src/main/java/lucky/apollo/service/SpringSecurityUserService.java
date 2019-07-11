@@ -15,6 +15,7 @@ public class SpringSecurityUserService implements UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Override
     public UserInfo findByusername(String username) {
         UserPO userPo = userRepository.findByUsername(username);
         return userPo != null ? userPo.toUserInfo() : null;
