@@ -7,5 +7,5 @@ import lucky.apollo.entity.bo.UserInfo;
  * @Date 2019/7/11
  */
 public interface UserService {
-    UserInfo findByusername(String userId);
+    UserInfo findByusername(String username);
 }
