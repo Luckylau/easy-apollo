@@ -63,6 +63,12 @@
         <version>19.0</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>0.7.0</version>
+      </dependency>
+
       <!-- declare Spring BOMs in order -->
       <dependency>
         <groupId>io.spring.platform</groupId>
