@@ -120,4 +120,4 @@ INSERT INTO `Users` (`Username`, `Password`, `Email`, `Enabled`)
 VALUES
 	('apollo', '$2a$10$7r20uS.BQ9uBpf3Baj3uQOZvMVvB1RN3PYoKE94gtz2.WAOuiiwXS', 'laujunbupt0913@163.com', 1);
 
-INSERT INTO `Authorities` (`Username`, `Authority`) VALUES ('apollo', 'ROLE_user');
+INSERT INTO `Authorities` (`Username`, `Authority`) VALUES ('apollo', 'ROLE_USER');
