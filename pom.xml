@@ -12,6 +12,7 @@
     <module>easy-apollo-common</module>
     <module>easy-apollo-portal</module>
     <module>easy-apollo-distribution</module>
+    <module>easy-apollo-adminservice</module>
   </modules>
   <packaging>pom</packaging>
 
