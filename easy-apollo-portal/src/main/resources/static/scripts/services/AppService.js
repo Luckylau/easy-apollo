@@ -8,7 +8,7 @@ appService.service('AppService', ['$resource', '$q', function ($resource, $q) {
         find_app_by_owner: {
             method: 'GET',
             isArray: true,
-            url: '/apps/by-owner'
+            url: '/apps/owner'
         },
         load_navtree: {
             method: 'GET',

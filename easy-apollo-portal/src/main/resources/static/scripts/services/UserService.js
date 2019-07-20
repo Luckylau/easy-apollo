@@ -10,7 +10,7 @@ appService.service('UserService', ['$resource', '$q', function ($resource, $q) {
         },
         create_or_update_user: {
             method: 'POST',
-            url: '/users'
+            url: '/user'
         }
     });
     return {
