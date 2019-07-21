@@ -1,22 +1,20 @@
 package lucky.apollo.controller;
 
 import lucky.apollo.entity.bo.UserInfo;
+import lucky.apollo.entity.po.UserPO;
+import lucky.apollo.exception.BadRequestException;
 import lucky.apollo.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import java.util.List;
 
 /**
  * @Author luckylau
  * @Date 2019/7/11
  */
 @RestController
-@RequestMapping("/user")
 public class UserInfoController {
     private final UserService userService;
 
@@ -24,27 +22,31 @@ public class UserInfoController {
         this.userService = userService;
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/user/{username}")
     public UserInfo getUserByUserId(@PathVariable String username) {
         return userService.findByusername(username);
     }
 
-    @GetMapping()
+    @GetMapping("/user")
     public UserInfo getUser() {
         UserInfo userInfo = new UserInfo();
-        userInfo.setUserId(getCurrentUsername());
+        userInfo.setUserId(userService.getCurrentUsername());
         return userInfo;
     }
 
-    private String getCurrentUsername() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof UserDetails) {
-            return ((UserDetails) principal).getUsername();
+    @PreAuthorize(value = "@PermissionValidator.isSuperAdmin()")
+    @PostMapping("/user")
+    public void createOrUpdateUser(@RequestBody UserPO user) {
+        if (StringUtils.isEmpty(user.getUsername()) || StringUtils.isEmpty(user.getPassword())) {
+            throw new BadRequestException("Username and password can not be empty.");
         }
-        if (principal instanceof Principal) {
-            return ((Principal) principal).getName();
-        }
-        return String.valueOf(principal);
+        userService.createOrUpdate(user);
     }
 
+    @GetMapping("/users")
+    public List<UserInfo> searchUsersByKeyword(@RequestParam(value = "keyword") String keyword,
+                                               @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                               @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return userService.searchUsers(keyword, offset, limit);
+    }
 }
