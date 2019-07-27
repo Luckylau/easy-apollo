@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @Author luckylau
  * @Date 2019/7/11
  */
-@SpringBootApplication(scanBasePackages = "lucky.apollo.portal")
+@SpringBootApplication
 @EnableTransactionManagement
 @ComponentScan(basePackageClasses = {ApolloCommonConfig.class,
         PortalApplication.class})
