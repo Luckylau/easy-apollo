@@ -1,7 +1,7 @@
 package lucky.apollo.portal.entity.model;
 
 import lombok.Data;
-import lucky.apollo.utils.Validator;
+import lucky.apollo.common.utils.Validator;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
