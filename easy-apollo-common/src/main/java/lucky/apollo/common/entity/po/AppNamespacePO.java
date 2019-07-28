@@ -35,9 +35,6 @@ public class AppNamespacePO extends BasePO {
     @Column(name = "Format", nullable = false)
     private String format;
 
-    @Column(name = "IsPublic", columnDefinition = "Bit default '0'")
-    private boolean isPublic = false;
-
     @Column(name = "Comment")
     private String comment;
 
@@ -65,14 +62,6 @@ public class AppNamespacePO extends BasePO {
         this.name = name;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean aPublic) {
-        isPublic = aPublic;
-    }
-
     public ConfigFileFormat formatAsEnum() {
         return ConfigFileFormat.fromString(this.format);
     }
@@ -88,6 +77,6 @@ public class AppNamespacePO extends BasePO {
     @Override
     public String toString() {
         return toStringHelper().add("name", name).add("appId", appId).add("comment", comment)
-                .add("format", format).add("isPublic", isPublic).toString();
+                .add("format", format).toString();
     }
 }

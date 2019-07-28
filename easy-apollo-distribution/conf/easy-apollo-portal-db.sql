@@ -201,8 +201,6 @@ CREATE TABLE `AppNamespace` (
   COMMENT 'app id',
   `Format`                    varchar(32)      NOT NULL DEFAULT 'properties'
   COMMENT 'namespace的format类型',
-  `IsPublic`                  bit(1)           NOT NULL DEFAULT b'0'
-  COMMENT 'namespace是否为公共',
   `Comment`                   varchar(64)      NOT NULL DEFAULT ''
   COMMENT '注释',
   `IsDeleted`                 bit(1)           NOT NULL DEFAULT b'0'
