@@ -403,4 +403,6 @@ INSERT INTO `Authorities` (`Username`, `Authority`) VALUES ('apollo', 'ROLE_USER
 
 INSERT INTO `ServerConfig` (`Key`, `Value`, `Comment`)
 VALUES
+  ('organizations',
+   '[{\"orgId\":\"easyApollo1\",\"orgName\":\"开发一部\"},{\"orgId\":\"easyApollo2\",\"orgName\":\"开发二部\"}]', '部门列表'),
   ('superAdmin', 'apollo', 'Portal超级管理员');
