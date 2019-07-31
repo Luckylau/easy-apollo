@@ -12,16 +12,58 @@
     <artifactId>easy-apollo-adminservice</artifactId>
 
     <name>easy-apollo-adminservice</name>
-    <!-- FIXME change it to the project's website -->
-    <url>http://www.example.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-netflix-archaius</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+                    <groupId>org.springframework.cloud</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ribbon-eureka</artifactId>
+                    <groupId>com.netflix.ribbon</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aws-java-sdk-core</artifactId>
+                    <groupId>com.amazonaws</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aws-java-sdk-ec2</artifactId>
+                    <groupId>com.amazonaws</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aws-java-sdk-autoscaling</artifactId>
+                    <groupId>com.amazonaws</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aws-java-sdk-sts</artifactId>
+                    <groupId>com.amazonaws</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>aws-java-sdk-route53</artifactId>
+                    <groupId>com.amazonaws</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>lucky.apollo</groupId>
+            <artifactId>easy-apollo-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
