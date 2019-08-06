@@ -1,8 +1,13 @@
 package lucky.apollo.portal.service.impl;
 
 
+import lucky.apollo.common.constant.ConfigConsts;
+import lucky.apollo.common.constant.ConfigFileFormat;
 import lucky.apollo.common.entity.po.AppNamespacePO;
+import lucky.apollo.portal.repository.AppNamespaceRepository;
 import lucky.apollo.portal.service.AppNamespaceService;
+import lucky.apollo.portal.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,9 +20,26 @@ import java.util.List;
 @Service
 public class AppNamespaceServiceImpl implements AppNamespaceService {
 
+    @Autowired
+    private AppNamespaceRepository appNamespaceRepository;
+
+    @Autowired
+    private UserService userService;
+
+
     @Override
     public void createDefaultAppNamespace(String appId) {
+        AppNamespacePO appNs = new AppNamespacePO();
+        appNs.setAppId(appId);
+        appNs.setName(ConfigConsts.NAMESPACE_APPLICATION);
+        appNs.setComment("default app namespace");
+        appNs.setFormat(ConfigFileFormat.Properties.getValue());
 
+        String operator = userService.getCurrentUser().getUserId();
+        appNs.setDataChangeCreatedBy(operator);
+        appNs.setDataChangeLastModifiedBy(operator);
+
+        appNamespaceRepository.save(appNs);
     }
 
     @Override

@@ -102,7 +102,9 @@ public class AppServiceImpl implements AppService {
 
         AppPO createdApp = appRepository.save(app);
 
+        //创建默认的appNamespace
         appNamespaceService.createDefaultAppNamespace(appId);
+        //初始化角色关系
         roleInitializationService.initAppRoles(createdApp);
 
         return createdApp;

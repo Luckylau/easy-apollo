@@ -1,8 +1,7 @@
 package lucky.apollo.portal.service.impl;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.portal.config.PortalConfig;
 import lucky.apollo.portal.entity.bo.UserInfo;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -127,6 +127,7 @@ public class RolePermissionServiceImpl implements RolePermissionService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public RolePO createRoleWithPermissions(RolePO role, Set<Long> permissionIds) {
+        //roleName格式 ：RoleType+AppId
         RolePO current = findRoleByRoleName(role.getRoleName());
         Preconditions.checkState(current == null, "Role %s already exists!", role.getRoleName());
 
@@ -159,17 +160,66 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 
     @Override
     public boolean userHasPermission(String userId, String permissionType, String targetId) {
+        PermissionPO permission =
+                permissionRepository.findTopByPermissionTypeAndTargetId(permissionType, targetId);
+        if (permission == null) {
+            return false;
+        }
+
+        if (isSuperAdmin(userId)) {
+            return true;
+        }
+
+        List<UserRolePO> userRoles = userRoleRepository.findByUserId(userId);
+        if (CollectionUtils.isEmpty(userRoles)) {
+            return false;
+        }
+
+        Set<Long> roleIds =
+                userRoles.stream().map(UserRolePO::getRoleId).collect(Collectors.toSet());
+        List<RolePermissionPO> rolePermissions = rolePermissionRepository.findByRoleIdIn(roleIds);
+        if (CollectionUtils.isEmpty(rolePermissions)) {
+            return false;
+        }
+
+        for (RolePermissionPO rolePermission : rolePermissions) {
+            if (rolePermission.getPermissionId() == permission.getId()) {
+                return true;
+            }
+        }
+
         return false;
     }
 
+    @Transactional
     @Override
     public PermissionPO createPermission(PermissionPO permission) {
-        return null;
+        String permissionType = permission.getPermissionType();
+        String targetId = permission.getTargetId();
+        PermissionPO current =
+                permissionRepository.findTopByPermissionTypeAndTargetId(permissionType, targetId);
+        Preconditions.checkState(current == null,
+                "Permission with permissionType %s targetId %s already exists!", permissionType, targetId);
+
+        return permissionRepository.save(permission);
     }
+
 
     @Override
     public Set<PermissionPO> createPermissions(Set<PermissionPO> permissions) {
-        return null;
+        Multimap<String, String> targetIdPermissionTypes = HashMultimap.create();
+        for (PermissionPO permissionPO : permissions) {
+            targetIdPermissionTypes.put(permissionPO.getTargetId(), permissionPO.getPermissionType());
+        }
+
+        for (String targetId : targetIdPermissionTypes.keySet()) {
+            Collection<String> permissionTypes = targetIdPermissionTypes.get(targetId);
+            List<PermissionPO> current = permissionRepository.findByPermissionTypeInAndTargetId(permissionTypes, targetId);
+            Preconditions.checkState(CollectionUtils.isEmpty(current), "Permission with permissionType %s targetId %s already exists!", permissionTypes, targetId);
+        }
+
+        Iterable<PermissionPO> results = permissionRepository.saveAll(permissions);
+        return FluentIterable.from(results).toSet();
     }
 
 

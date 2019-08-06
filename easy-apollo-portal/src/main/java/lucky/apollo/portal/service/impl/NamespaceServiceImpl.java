@@ -190,7 +190,7 @@ public class NamespaceServiceImpl implements NamespaceService {
                 appNamespaceService
                         .findByAppIdAndName(namespaceDTO.getAppId(), namespaceDTO.getNamespaceName());
         String format;
-        boolean isPublic;
+        boolean isPublic = false;
         if (appNamespace == null) {
             //dirty data
             format = ConfigFileFormat.Properties.getValue();
@@ -198,7 +198,6 @@ public class NamespaceServiceImpl implements NamespaceService {
             isPublic = true;
         } else {
             format = appNamespace.getFormat();
-            isPublic = appNamespace.isPublic();
             namespace.setParentAppId(appNamespace.getAppId());
             namespace.setComment(appNamespace.getComment());
         }

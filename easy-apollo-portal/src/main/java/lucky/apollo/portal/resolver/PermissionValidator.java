@@ -35,9 +35,6 @@ public class PermissionValidator {
     public boolean shouldHideConfigToCurrentUser(String appId, String namespaceName) {
         // 1. public namespace is open to every one
         AppNamespacePO appNamespace = appNamespaceService.findByAppIdAndName(appId, namespaceName);
-        if (appNamespace != null && appNamespace.isPublic()) {
-            return false;
-        }
 
         // 2. check app admin and operate permissions
         return !isAppAdmin(appId) && !hasOperateNamespacePermission(appId, namespaceName);
@@ -67,6 +64,10 @@ public class PermissionValidator {
         return rolePermissionService.userHasPermission(userService.getCurrentUser().getUserId(),
                 PermissionType.RELEASE_NAMESPACE,
                 RoleUtils.buildNamespaceTargetId(appId, namespaceName));
+    }
+
+    public boolean hasCreateApplicationPermission() {
+        return rolePermissionService.userHasPermission(userService.getCurrentUser().getUserId(), PermissionType.CREATE_APPLICATION, null);
     }
 
 

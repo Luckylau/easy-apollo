@@ -35,6 +35,7 @@ public class RoleInitializationServiceImpl implements RoleInitializationService 
     public void initAppRoles(AppPO app) {
         String appId = app.getAppId();
 
+        //Master+appId
         String appMasterRoleName = RoleUtils.buildAppMasterRoleName(appId);
 
         //has created before
@@ -64,15 +65,17 @@ public class RoleInitializationServiceImpl implements RoleInitializationService 
     }
 
     private void createAppMasterRole(String appId, String operator) {
+        //CreateNamespace 和 AssignRole 的权限
         Set<PermissionPO> appPermissions =
                 Stream.of(PermissionType.CREATE_NAMESPACE, PermissionType.ASSIGN_ROLE)
                         .map(permissionType -> createPermission(appId, permissionType, operator)).collect(Collectors.toSet());
         Set<PermissionPO> createdAppPermissions = rolePermissionService.createPermissions(appPermissions);
+
         Set<Long>
                 appPermissionIds =
                 createdAppPermissions.stream().map(BasePO::getId).collect(Collectors.toSet());
 
-        //create app master role
+        //create app master role， roleName 为 master+role
         RolePO appMasterRole = createRole(RoleUtils.buildAppMasterRoleName(appId), operator);
 
         rolePermissionService.createRoleWithPermissions(appMasterRole, appPermissionIds);
