@@ -1,13 +1,17 @@
 package lucky.apollo.portal.config;
 
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.common.config.RefreshableConfig;
 import lucky.apollo.common.config.RefreshablePropertySource;
 import lucky.apollo.portal.component.PortalPropertySourceRefresher;
 import lucky.apollo.portal.constant.ServerConfigKey;
+import lucky.apollo.portal.entity.vo.Organization;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,6 +22,11 @@ import java.util.List;
 @Service
 @Slf4j
 public class PortalConfig extends RefreshableConfig {
+
+    private static final Type ORGANIZATION = new TypeToken<List<Organization>>() {
+    }.getType();
+    private Gson gson = new Gson();
+
 
     private final PortalPropertySourceRefresher portalPropertySourceRefresher;
 
@@ -36,6 +45,16 @@ public class PortalConfig extends RefreshableConfig {
             return Collections.emptyList();
         }
         return splitter.splitToList(superAdminConfig);
+    }
+
+    public List<Organization> organizations() {
+
+        String organizations = getValue("organizations");
+        return organizations == null ? Collections.emptyList() : gson.fromJson(organizations, ORGANIZATION);
+    }
+
+    public String wikiAddress() {
+        return getValue("wiki.address", "https://github.com/ctripcorp/apollo/wiki");
     }
 
 
