@@ -1,11 +1,17 @@
 package lucky.apollo.portal.controller;
 
 import com.google.common.collect.Sets;
+import lucky.apollo.common.constant.Env;
+import lucky.apollo.common.entity.dto.ClusterDTO;
 import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.entity.po.AppPO;
 import lucky.apollo.common.exception.BadRequestException;
+import lucky.apollo.common.http.MultiResponseEntity;
+import lucky.apollo.common.http.RichResponseEntity;
+import lucky.apollo.portal.config.PortalConfig;
 import lucky.apollo.portal.entity.model.AppModel;
 import lucky.apollo.portal.entity.po.RolePO;
+import lucky.apollo.portal.entity.vo.EnvClusterInfo;
 import lucky.apollo.portal.listener.AppChangedEvent;
 import lucky.apollo.portal.listener.AppCreationEvent;
 import lucky.apollo.portal.listener.AppDeletionEvent;
@@ -15,6 +21,7 @@ import lucky.apollo.portal.service.UserService;
 import lucky.apollo.portal.utils.RoleUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -41,11 +48,19 @@ public class AppController {
 
     private final ApplicationEventPublisher publisher;
 
-    public AppController(AppService appService, RolePermissionService rolePermissionService, UserService userService, ApplicationEventPublisher publisher) {
+    private final PortalConfig portalConfig;
+
+    public AppController(AppService appService, RolePermissionService rolePermissionService, UserService userService, ApplicationEventPublisher publisher, PortalConfig portalConfig) {
         this.appService = appService;
         this.rolePermissionService = rolePermissionService;
         this.userService = userService;
         this.publisher = publisher;
+        this.portalConfig = portalConfig;
+    }
+
+    @RequestMapping(value = "/{appId}/miss_envs", method = RequestMethod.GET)
+    public MultiResponseEntity<Env> findEnvs(@PathVariable String appId) {
+        return MultiResponseEntity.ok();
     }
 
     @GetMapping
@@ -122,6 +137,25 @@ public class AppController {
     public AppPO load(@PathVariable String appId) {
 
         return appService.load(appId);
+    }
+
+    @RequestMapping(value = "/{appId}/navtree", method = RequestMethod.GET)
+    public MultiResponseEntity<EnvClusterInfo> nav(@PathVariable String appId) {
+
+        MultiResponseEntity<EnvClusterInfo> response = MultiResponseEntity.ok();
+        Env env = portalConfig.getActiveEnv();
+        try {
+            EnvClusterInfo envClusterInfo = new EnvClusterInfo();
+            envClusterInfo.setEnv(env);
+            envClusterInfo.setClusterDTO(new ClusterDTO(appId));
+            response.addResponseEntity(RichResponseEntity.ok(envClusterInfo));
+        } catch (Exception e) {
+            response.addResponseEntity(RichResponseEntity.error(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "load env:" + env.name() + " cluster error." + e
+                            .getMessage()));
+        }
+
+        return response;
     }
 
 

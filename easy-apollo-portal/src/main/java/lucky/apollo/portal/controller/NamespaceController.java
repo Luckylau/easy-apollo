@@ -193,9 +193,8 @@ public class NamespaceController {
 
         for (AppNamespacePO appNamespace : portalDbAppNamespaces) {
             portalDbAllAppNamespaceNames.add(appNamespace.getName());
-            if (!appNamespace.isPublic()) {
-                portalDbPrivateAppNamespaceNames.add(appNamespace.getName());
-            }
+            portalDbPrivateAppNamespaceNames.add(appNamespace.getName());
+
         }
 
         // AppNamespaces should be the same
