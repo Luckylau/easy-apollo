@@ -3,7 +3,7 @@ package lucky.apollo.client.util;
 import com.google.common.base.Strings;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 public class Utils {

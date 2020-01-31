@@ -1,7 +1,7 @@
 package lucky.apollo.client.config;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public interface ConfigRegistry {

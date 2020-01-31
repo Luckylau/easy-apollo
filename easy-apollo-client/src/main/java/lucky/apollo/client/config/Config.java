@@ -8,7 +8,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public interface Config {

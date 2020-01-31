@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 public class BOMInputStream extends ProxyInputStream {

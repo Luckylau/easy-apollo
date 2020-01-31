@@ -11,9 +11,10 @@ import lucky.apollo.client.config.impl.DefaultConfigManager;
 import lucky.apollo.client.config.impl.DefaultConfigRegistry;
 import lucky.apollo.client.exception.ApolloConfigException;
 import lucky.apollo.client.foundation.spi.Injector;
+import lucky.apollo.client.util.ConfigUtil;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public class DefaultInjector implements Injector {

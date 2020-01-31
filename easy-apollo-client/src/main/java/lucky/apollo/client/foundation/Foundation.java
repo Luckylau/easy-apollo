@@ -5,7 +5,7 @@ import lucky.apollo.client.foundation.spi.ProviderManager;
 import lucky.apollo.client.foundation.spi.impl.NullProviderManager;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 @Slf4j

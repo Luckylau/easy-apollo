@@ -8,7 +8,7 @@ import lucky.apollo.client.foundation.spi.ServerProvider;
 import java.io.InputStream;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 public class NullProvider implements ApplicationProvider, NetworkProvider, ServerProvider {

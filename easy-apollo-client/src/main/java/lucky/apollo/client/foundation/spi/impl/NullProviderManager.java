@@ -3,7 +3,7 @@ package lucky.apollo.client.foundation.spi.impl;
 import lucky.apollo.client.foundation.spi.ProviderManager;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 public class NullProviderManager implements ProviderManager {

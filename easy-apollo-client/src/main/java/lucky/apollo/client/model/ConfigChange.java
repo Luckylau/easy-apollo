@@ -3,7 +3,7 @@ package lucky.apollo.client.model;
 import lucky.apollo.client.enums.PropertyChangeType;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public class ConfigChange {

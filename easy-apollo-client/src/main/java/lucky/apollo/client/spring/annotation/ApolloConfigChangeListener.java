@@ -5,7 +5,7 @@ import lucky.apollo.common.constant.ConfigConsts;
 import java.lang.annotation.*;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 @Retention(RetentionPolicy.RUNTIME)

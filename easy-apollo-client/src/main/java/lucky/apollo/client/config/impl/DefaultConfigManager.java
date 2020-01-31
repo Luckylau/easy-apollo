@@ -6,7 +6,7 @@ import lucky.apollo.client.config.ConfigManager;
 import lucky.apollo.common.constant.ConfigFileFormat;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public class DefaultConfigManager implements ConfigManager {

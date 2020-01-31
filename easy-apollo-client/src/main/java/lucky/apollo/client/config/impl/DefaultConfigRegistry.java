@@ -4,7 +4,7 @@ import lucky.apollo.client.config.ConfigFactory;
 import lucky.apollo.client.config.ConfigRegistry;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public class DefaultConfigRegistry implements ConfigRegistry {

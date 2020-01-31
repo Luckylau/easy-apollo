@@ -3,7 +3,7 @@ package lucky.apollo.client.listener;
 import lucky.apollo.client.model.ConfigFileChangeEvent;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public interface ConfigFileChangeListener {

@@ -5,7 +5,7 @@ import lucky.apollo.client.foundation.ServiceBootstrap;
 import lucky.apollo.client.foundation.spi.Injector;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/13
  */
 public class ApolloInjector {

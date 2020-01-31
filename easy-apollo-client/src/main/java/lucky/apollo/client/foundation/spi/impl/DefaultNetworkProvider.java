@@ -4,7 +4,7 @@ import lucky.apollo.client.foundation.spi.NetworkProvider;
 import lucky.apollo.client.foundation.spi.Provider;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/18
  */
 public class DefaultNetworkProvider implements NetworkProvider {

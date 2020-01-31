@@ -3,7 +3,7 @@ package lucky.apollo.client.foundation.spi;
 import java.io.InputStream;
 
 /**
- * @Author liuJun
+ * @Author luckylau
  * @Date 2019/12/17
  */
 public interface ApplicationProvider extends Provider {
