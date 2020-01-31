@@ -43,9 +43,9 @@ public class RoleInitializationServiceImpl implements RoleInitializationService 
             return;
         }
         String operator = app.getDataChangeCreatedBy();
-        //create app permissions
+        //创建Master+appId的角色，并分配CreateNamespace 和 AssignRole 的权限
         createAppMasterRole(appId, operator);
-        //create manageAppMaster permission
+        //创建manageAppMaster+appId的角色，并分配 ManageAppMaster 权限
         createManageAppMasterRole(appId, operator);
 
         //assign master role to user
@@ -78,6 +78,7 @@ public class RoleInitializationServiceImpl implements RoleInitializationService 
         //create app master role， roleName 为 master+role
         RolePO appMasterRole = createRole(RoleUtils.buildAppMasterRoleName(appId), operator);
 
+        //角色分配权限
         rolePermissionService.createRoleWithPermissions(appMasterRole, appPermissionIds);
     }
 

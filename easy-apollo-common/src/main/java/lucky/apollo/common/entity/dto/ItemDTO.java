@@ -9,9 +9,9 @@ import lombok.Data;
 @Data
 public class ItemDTO extends BaseDTO {
 
-    private long id;
+    private Long id;
 
-    private long namespaceId;
+    private Long namespaceId;
 
     private String key;
 
@@ -19,5 +19,15 @@ public class ItemDTO extends BaseDTO {
 
     private String comment;
 
-    private int lineNum;
+    private Integer lineNum;
+
+    public ItemDTO() {
+    }
+
+    public ItemDTO(String key, String value, String comment, int lineNum) {
+        this.key = key;
+        this.value = value;
+        this.comment = comment;
+        this.lineNum = lineNum;
+    }
 }

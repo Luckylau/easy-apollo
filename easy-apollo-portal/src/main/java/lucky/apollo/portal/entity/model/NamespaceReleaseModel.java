@@ -13,6 +13,7 @@ public class NamespaceReleaseModel implements Verifiable {
 
     private String appId;
     private String namespaceName;
+    private String clusterName;
     private String releaseTitle;
     private String releaseComment;
     private String releasedBy;
@@ -20,6 +21,6 @@ public class NamespaceReleaseModel implements Verifiable {
 
     @Override
     public boolean isInvalid() {
-        return StringUtils.isContainEmpty(appId, namespaceName, releaseTitle);
+        return StringUtils.isContainEmpty(appId, clusterName, namespaceName, releaseTitle);
     }
 }

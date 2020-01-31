@@ -2,10 +2,7 @@ package lucky.apollo.core.service.impl;
 
 import lucky.apollo.common.constant.ConfigConsts;
 import lucky.apollo.common.entity.po.AppPO;
-import lucky.apollo.core.service.AdminService;
-import lucky.apollo.core.service.AppNamespaceService;
-import lucky.apollo.core.service.AppService;
-import lucky.apollo.core.service.NamespaceService;
+import lucky.apollo.core.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +22,9 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private NamespaceService namespaceService;
 
+    @Autowired
+    private ClusterService clusterService;
+
     @Override
     public AppPO createNewApp(AppPO app) {
         String createBy = app.getDataChangeCreatedBy();
@@ -33,6 +33,8 @@ public class AdminServiceImpl implements AdminService {
         String appId = createdApp.getAppId();
 
         appNamespaceService.createDefaultAppNamespace(appId, createBy);
+
+        clusterService.createDefaultCluster(appId, createBy);
 
         namespaceService.instanceOfAppNamespaces(appId, ConfigConsts.CLUSTER_NAME_DEFAULT, createBy);
 

@@ -2,7 +2,6 @@ package lucky.apollo.portal.controller;
 
 import com.google.common.collect.Sets;
 import lucky.apollo.common.constant.Env;
-import lucky.apollo.common.entity.dto.ClusterDTO;
 import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.entity.po.AppPO;
 import lucky.apollo.common.exception.BadRequestException;
@@ -139,16 +138,13 @@ public class AppController {
         return appService.load(appId);
     }
 
-    @RequestMapping(value = "/{appId}/navtree", method = RequestMethod.GET)
+    @GetMapping(value = "/{appId}/navtree")
     public MultiResponseEntity<EnvClusterInfo> nav(@PathVariable String appId) {
 
         MultiResponseEntity<EnvClusterInfo> response = MultiResponseEntity.ok();
         Env env = portalConfig.getActiveEnv();
         try {
-            EnvClusterInfo envClusterInfo = new EnvClusterInfo();
-            envClusterInfo.setEnv(env);
-            envClusterInfo.setClusterDTO(new ClusterDTO(appId));
-            response.addResponseEntity(RichResponseEntity.ok(envClusterInfo));
+            response.addResponseEntity(RichResponseEntity.ok(appService.createEnvNavNode(appId)));
         } catch (Exception e) {
             response.addResponseEntity(RichResponseEntity.error(HttpStatus.INTERNAL_SERVER_ERROR,
                     "load env:" + env.name() + " cluster error." + e

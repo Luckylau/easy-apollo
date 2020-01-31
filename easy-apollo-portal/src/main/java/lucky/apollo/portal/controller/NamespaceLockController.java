@@ -2,7 +2,7 @@ package lucky.apollo.portal.controller;
 
 
 import lucky.apollo.common.entity.dto.NamespaceLockDTO;
-import lucky.apollo.portal.api.AdminServiceApi;
+import lucky.apollo.portal.adminsevice.api.AdminServiceApi;
 import lucky.apollo.portal.entity.vo.Lock;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

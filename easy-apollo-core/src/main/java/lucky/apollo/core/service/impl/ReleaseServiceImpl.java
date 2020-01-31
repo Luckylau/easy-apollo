@@ -16,6 +16,7 @@ import lucky.apollo.core.constant.OpAudit;
 import lucky.apollo.core.entity.*;
 import lucky.apollo.core.repository.ReleaseRepository;
 import lucky.apollo.core.service.*;
+import lucky.apollo.core.utils.GrayReleaseRuleItemTransformer;
 import lucky.apollo.core.utils.ReleaseKeyGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,6 +66,9 @@ public class ReleaseServiceImpl implements ReleaseService {
 
     @Autowired
     private ReleaseHistoryService releaseHistoryService;
+
+    @Autowired
+    private NamespaceBranchService namespaceBranchService;
 
     @Override
     public ReleasePO findOne(long releaseId) {
@@ -202,16 +206,26 @@ public class ReleaseServiceImpl implements ReleaseService {
     public ReleasePO grayDeletionPublish(NamespacePO namespace, String releaseName, String releaseComment,
                                          String operator, boolean isEmergencyPublish, Set<String> grayDelKeys) {
 
-        return null;
+        Map<String, String> operateNamespaceItems = getNamespaceItems(namespace);
+
+        NamespacePO parentNamespace = namespaceService.findParentNamespace(namespace);
+
+        //branch release
+        if (parentNamespace != null) {
+            return publishBranchNamespace(parentNamespace, namespace, operateNamespaceItems,
+                    releaseName, releaseComment, operator, isEmergencyPublish, grayDelKeys);
+        } else {
+            throw new NotFoundException("Parent namespace not found");
+        }
     }
 
     private void checkLock(NamespacePO namespace, boolean isEmergencyPublish, String operator) {
-        if (!isEmergencyPublish) {
+        /*if (!isEmergencyPublish) {
             NamespaceLockPO lock = namespaceLockService.findLock(namespace.getId());
             if (lock != null && lock.getDataChangeCreatedBy().equals(operator)) {
                 throw new BadRequestException("Config can not be published by yourself.");
             }
-        }
+        }*/
     }
 
     private void mergeFromMasterAndPublishBranch(NamespacePO parentNamespace, NamespacePO childNamespace,
@@ -296,7 +310,37 @@ public class ReleaseServiceImpl implements ReleaseService {
                                     String releaseName, String releaseComment,
                                     Map<String, String> configurations, long baseReleaseId,
                                     String operator, int releaseOperation, boolean isEmergencyPublish, Collection<String> branchReleaseKeys) {
-        return null;
+        ReleasePO previousRelease = findLatestActiveRelease(childNamespace.getAppId(),
+                childNamespace.getClusterName(),
+                childNamespace.getNamespaceName());
+        long previousReleaseId = previousRelease == null ? 0 : previousRelease.getId();
+
+        Map<String, Object> releaseOperationContext = Maps.newHashMap();
+        releaseOperationContext.put(ReleaseOperationContext.BASE_RELEASE_ID, baseReleaseId);
+        releaseOperationContext.put(ReleaseOperationContext.IS_EMERGENCY_PUBLISH, isEmergencyPublish);
+        releaseOperationContext.put(ReleaseOperationContext.BRANCH_RELEASE_KEYS, branchReleaseKeys);
+
+        ReleasePO release =
+                createRelease(childNamespace, releaseName, releaseComment, configurations, operator);
+
+        //update gray release rules
+        GrayReleaseRulePO grayReleaseRule = namespaceBranchService.updateRulesReleaseId(childNamespace.getAppId(),
+                parentNamespace.getClusterName(),
+                childNamespace.getNamespaceName(),
+                childNamespace.getClusterName(),
+                release.getId(), operator);
+
+        if (grayReleaseRule != null) {
+            releaseOperationContext.put(ReleaseOperationContext.RULES, GrayReleaseRuleItemTransformer
+                    .batchTransformFromJSON(grayReleaseRule.getRules()));
+        }
+
+        releaseHistoryService.createReleaseHistory(parentNamespace.getAppId(), parentNamespace.getClusterName(),
+                parentNamespace.getNamespaceName(), childNamespace.getClusterName(),
+                release.getId(),
+                previousReleaseId, releaseOperation, releaseOperationContext, operator);
+
+        return release;
     }
 
     private Map<String, String> mergeConfiguration(Map<String, String> baseConfigurations,
@@ -351,6 +395,7 @@ public class ReleaseServiceImpl implements ReleaseService {
         return release;
     }
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public ReleasePO rollback(long releaseId, String operator) {
         ReleasePO release = findOne(releaseId);

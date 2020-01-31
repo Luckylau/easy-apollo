@@ -49,7 +49,7 @@ public class AppNamespaceServiceImpl implements AppNamespaceService {
 
     @Override
     public AppNamespacePO findByAppIdAndName(String appId, String namespaceName) {
-        return null;
+        return appNamespaceRepository.findByAppIdAndName(appId, namespaceName);
     }
 
     @Override

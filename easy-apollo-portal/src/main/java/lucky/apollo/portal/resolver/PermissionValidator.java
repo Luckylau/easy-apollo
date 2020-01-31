@@ -1,7 +1,6 @@
 package lucky.apollo.portal.resolver;
 
 import lombok.extern.slf4j.Slf4j;
-import lucky.apollo.common.entity.po.AppNamespacePO;
 import lucky.apollo.portal.constant.PermissionType;
 import lucky.apollo.portal.service.AppNamespaceService;
 import lucky.apollo.portal.service.RolePermissionService;
@@ -32,14 +31,6 @@ public class PermissionValidator {
         return rolePermissionService.isSuperAdmin(userService.getCurrentUser().getUserId());
     }
 
-    public boolean shouldHideConfigToCurrentUser(String appId, String namespaceName) {
-        // 1. public namespace is open to every one
-        AppNamespacePO appNamespace = appNamespaceService.findByAppIdAndName(appId, namespaceName);
-
-        // 2. check app admin and operate permissions
-        return !isAppAdmin(appId) && !hasOperateNamespacePermission(appId, namespaceName);
-    }
-
     public boolean hasAssignRolePermission(String appId) {
         return rolePermissionService.userHasPermission(userService.getCurrentUser().getUserId(),
                 PermissionType.ASSIGN_ROLE,
@@ -68,6 +59,12 @@ public class PermissionValidator {
 
     public boolean hasCreateApplicationPermission() {
         return rolePermissionService.userHasPermission(userService.getCurrentUser().getUserId(), PermissionType.CREATE_APPLICATION, null);
+    }
+
+    public boolean hasCreateClusterPermission(String appId) {
+        return rolePermissionService.userHasPermission(userService.getCurrentUser().getUserId(),
+                PermissionType.CREATE_CLUSTER,
+                appId);
     }
 
 

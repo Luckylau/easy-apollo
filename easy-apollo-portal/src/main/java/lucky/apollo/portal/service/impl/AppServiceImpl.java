@@ -6,8 +6,10 @@ import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.entity.po.AppPO;
 import lucky.apollo.common.exception.BadRequestException;
 import lucky.apollo.common.utils.BeanUtils;
-import lucky.apollo.portal.api.AdminServiceApi;
+import lucky.apollo.portal.adminsevice.api.AdminServiceApi;
+import lucky.apollo.portal.config.PortalConfig;
 import lucky.apollo.portal.entity.bo.UserInfo;
+import lucky.apollo.portal.entity.vo.EnvClusterInfo;
 import lucky.apollo.portal.repository.AppRepository;
 import lucky.apollo.portal.service.*;
 import org.springframework.data.domain.Page;
@@ -37,17 +39,23 @@ public class AppServiceImpl implements AppService {
 
     private final RolePermissionService rolePermissionService;
 
+    private final ClusterService clusterService;
+
     private final AdminServiceApi adminServiceApi;
 
+    private final PortalConfig portalConfig;
 
-    public AppServiceImpl(AppRepository appRepository, UserService userService, AppNamespaceService appNamespaceService, RoleInitializationService roleInitializationService, FavoriteService favoriteService, RolePermissionService rolePermissionService, AdminServiceApi adminServiceApi) {
+
+    public AppServiceImpl(AppRepository appRepository, UserService userService, AppNamespaceService appNamespaceService, RoleInitializationService roleInitializationService, FavoriteService favoriteService, RolePermissionService rolePermissionService, ClusterService clusterService, AdminServiceApi adminServiceApi, PortalConfig portalConfig) {
         this.appRepository = appRepository;
         this.userService = userService;
         this.appNamespaceService = appNamespaceService;
         this.roleInitializationService = roleInitializationService;
         this.favoriteService = favoriteService;
         this.rolePermissionService = rolePermissionService;
+        this.clusterService = clusterService;
         this.adminServiceApi = adminServiceApi;
+        this.portalConfig = portalConfig;
     }
 
     @Override
@@ -151,6 +159,13 @@ public class AppServiceImpl implements AppService {
     @Override
     public AppPO load(String appId) {
         return appRepository.findByAppId(appId);
+    }
+
+    @Override
+    public EnvClusterInfo createEnvNavNode(String appId) {
+        EnvClusterInfo node = new EnvClusterInfo(portalConfig.getActiveEnv());
+        node.setClusters(clusterService.findClusters(appId));
+        return node;
     }
 
 

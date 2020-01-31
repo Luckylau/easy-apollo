@@ -14,7 +14,9 @@ import lucky.apollo.core.service.NamespaceService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
+@RestController
 public class NamespaceController {
 
     private final NamespaceService namespaceService;
@@ -37,6 +39,14 @@ public class NamespaceController {
 
         return BeanUtils.transformWithIgnoreNull(NamespaceDTO.class, entity);
     }
+
+    @GetMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces")
+    public List<NamespaceDTO> find(@PathVariable("appId") String appId,
+                                   @PathVariable("clusterName") String clusterName) {
+        List<NamespacePO> groups = namespaceService.findNamespaces(appId, clusterName);
+        return BeanUtils.batchTransformWithIgnoreNull(NamespaceDTO.class, groups);
+    }
+
 
     @DeleteMapping("/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName:.+}")
     public void delete(@PathVariable("appId") String appId,

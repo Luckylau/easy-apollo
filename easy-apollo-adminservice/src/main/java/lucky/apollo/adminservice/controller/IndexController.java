@@ -14,6 +14,6 @@ public class IndexController {
 
     @GetMapping
     public String index() {
-        return "apollo-adminservice";
+        return "easy-apollo-adminservice";
     }
 }

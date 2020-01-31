@@ -34,7 +34,7 @@ public class MessageSender {
         cleanStopped = new AtomicBoolean(false);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void sendMessage(String message, String channel) {
         log.info("Sending message {} to channel {}", message, channel);
         if (!Objects.equals(channel, MessageTopic.APOLLO_RELEASE_TOPIC)) {

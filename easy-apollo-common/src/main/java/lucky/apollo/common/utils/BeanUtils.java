@@ -116,4 +116,39 @@ public class BeanUtils {
         return field;
     }
 
+    /**
+     * 用于将一个列表转换为列表中的对象的某个属性映射到列表中的对象
+     *
+     * @param key
+     * @param list
+     * @param <K>
+     * @param <V>
+     * @return
+     */
+    public static <K, V> Map<K, List<V>> mapByKeyToList(String key, List<?> list) {
+        Map<K, List<V>> map = new HashMap<>(16);
+        if (CollectionUtils.isEmpty(list)) {
+            return map;
+        }
+
+        try {
+            Class<? extends Object> clazz = list.get(0).getClass();
+            Field field = deepFindField(clazz, key);
+            if (field == null) {
+                throw new IllegalArgumentException("Could not find the key");
+            }
+            field.setAccessible(true);
+            for (Object o : list) {
+                K k = (K) field.get(o);
+                if (map.get(k) == null) {
+                    map.put(k, new ArrayList<V>());
+                }
+                map.get(k).add((V) o);
+            }
+        } catch (Exception e) {
+            throw new BeanUtilsException(e);
+        }
+        return map;
+    }
+
 }

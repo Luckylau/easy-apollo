@@ -5,6 +5,7 @@ import lucky.apollo.common.constant.GsonType;
 import lucky.apollo.common.entity.po.AppNamespacePO;
 import lucky.apollo.common.utils.BeanUtils;
 import lucky.apollo.core.constant.OpAudit;
+import lucky.apollo.core.entity.ClusterPO;
 import lucky.apollo.core.entity.ItemPO;
 import lucky.apollo.core.entity.NamespacePO;
 import lucky.apollo.core.entity.ReleasePO;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @Author luckylau
@@ -60,6 +62,9 @@ public class NamespaceServiceImpl implements NamespaceService {
     @Autowired
     private MessageSender messageSender;
 
+    @Autowired
+    private ClusterService clusterService;
+
 
     @Override
     public NamespacePO findOne(Long namespaceId) {
@@ -73,6 +78,7 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
 
+    @Override
     public List<NamespacePO> findNamespaces(String appId, String clusterName) {
         List<NamespacePO> namespaces = namespaceRepository.findByAppIdAndClusterNameOrderByIdAsc(appId, clusterName);
         if (namespaces == null) {
@@ -81,6 +87,30 @@ public class NamespaceServiceImpl implements NamespaceService {
         return namespaces;
     }
 
+    @Override
+    public NamespacePO findChildNamespace(String appId, String parentClusterName, String namespaceName) {
+        List<NamespacePO> namespaces = findByAppIdAndNamespaceName(appId, namespaceName);
+        if (CollectionUtils.isEmpty(namespaces) || namespaces.size() == 1) {
+            return null;
+        }
+
+        List<ClusterPO> childClusters = clusterService.findChildClusters(appId, parentClusterName);
+        if (CollectionUtils.isEmpty(childClusters)) {
+            return null;
+        }
+
+        Set<String> childClusterNames = childClusters.stream().map(ClusterPO::getName).collect(Collectors.toSet());
+        //the child namespace is the intersection of the child clusters and child namespaces
+        for (NamespacePO namespace : namespaces) {
+            if (childClusterNames.contains(namespace.getClusterName())) {
+                return namespace;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public List<NamespacePO> findByAppIdAndNamespaceName(String appId, String namespaceName) {
         return namespaceRepository.findByAppIdAndNamespaceNameOrderByIdAsc(appId, namespaceName);
     }
@@ -95,6 +125,7 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @Override
     public void deleteByAppIdAndClusterName(String appId, String clusterName, String operator) {
 
         List<NamespacePO> toDeleteNamespaces = findNamespaces(appId, clusterName);
@@ -104,6 +135,21 @@ public class NamespaceServiceImpl implements NamespaceService {
             deleteNamespace(namespace, operator);
 
         }
+    }
+
+    @Override
+    public NamespacePO findParentNamespace(NamespacePO namespacePO) {
+        String appId = namespacePO.getAppId();
+        String namespaceName = namespacePO.getNamespaceName();
+
+        ClusterPO cluster = clusterService.findOne(appId, namespacePO.getClusterName());
+        if (cluster != null && cluster.getParentClusterId() > 0) {
+            ClusterPO parentCluster = clusterService.findOne(cluster.getParentClusterId());
+            return findOne(appId, parentCluster.getName(), namespaceName);
+        }
+
+        return null;
+
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -130,7 +176,7 @@ public class NamespaceServiceImpl implements NamespaceService {
         NamespacePO deleted = namespaceRepository.save(namespace);
 
         //Publish release message to do some clean up in config service, such as updating the cache
-        messageSender.sendMessage(ReleaseMessageKeyGenerator.generate(appId, namespaceName),
+        messageSender.sendMessage(ReleaseMessageKeyGenerator.generate(appId, clusterName, namespaceName),
                 MessageTopic.APOLLO_RELEASE_TOPIC);
 
         return deleted;

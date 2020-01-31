@@ -4,7 +4,7 @@ import com.google.common.base.Splitter;
 import lucky.apollo.common.entity.dto.InstanceDTO;
 import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.exception.BadRequestException;
-import lucky.apollo.portal.api.AdminServiceApi;
+import lucky.apollo.portal.adminsevice.api.AdminServiceApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -32,13 +32,13 @@ public class ItemSetServiceImpl implements ItemSetService {
     @Autowired
     private ItemService itemService;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ItemChangeSetsDTO updateSet(NamespacePO namespace, ItemChangeSetsDTO changeSets) {
         return updateSet(namespace.getAppId(), namespace.getClusterName(), namespace.getNamespaceName(), changeSets);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ItemChangeSetsDTO updateSet(String appId, String clusterName,
                                        String namespaceName, ItemChangeSetsDTO changeSet) {

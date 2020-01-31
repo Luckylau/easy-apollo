@@ -10,7 +10,10 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-
+/**
+ * @Author luckylau
+ * @Date 2019/7/17
+ */
 public class ConfigChangeContentBuilder {
 
     private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();

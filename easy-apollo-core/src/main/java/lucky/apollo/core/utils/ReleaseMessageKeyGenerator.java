@@ -9,9 +9,9 @@ import lucky.apollo.common.constant.ConfigConsts;
  * @Date 2019/7/25
  */
 public class ReleaseMessageKeyGenerator {
-    private static final Joiner STRING_JOINER = Joiner.on(ConfigConsts.APP_NAMESPACE_SEPARATOR);
+    private static final Joiner STRING_JOINER = Joiner.on(ConfigConsts.CLUSTER_NAMESPACE_SEPARATOR);
 
-    public static String generate(String appId, String namespace) {
-        return STRING_JOINER.join(appId, namespace);
+    public static String generate(String appId, String cluster, String namespace) {
+        return STRING_JOINER.join(appId, cluster, namespace);
     }
 }

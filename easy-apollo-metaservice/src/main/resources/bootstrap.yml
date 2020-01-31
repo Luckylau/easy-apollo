@@ -1,0 +1,29 @@
+eureka:
+  instance:
+    hostname: ${hostname:localhost}
+    preferIpAddress: true
+    status-page-url-path: /info
+    health-check-url-path: /health
+  client:
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:7070/eureka/
+    healthcheck:
+      enabled: true
+    eurekaServiceUrlPollIntervalSeconds: 60
+    register-with-eureka: true
+    fetch-registry: true
+    registry-fetch-interval-seconds: 30
+
+management:
+  endpoints:
+    web:
+      base-path:
+      exposure:
+        include: "*"
+  health:
+    status:
+      order: DOWN, OUT_OF_SERVICE, UNKNOWN, UP
+info:
+  app.name: easy-meta-service
+  contact: laujunbupt0913@163.com
+  blog: http://luckylau.tech

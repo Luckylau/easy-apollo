@@ -7,7 +7,7 @@ import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.entity.dto.ReleaseDTO;
 import lucky.apollo.common.entity.dto.ReleaseHistoryDTO;
 import lucky.apollo.common.utils.BeanUtils;
-import lucky.apollo.portal.api.AdminServiceApi;
+import lucky.apollo.portal.adminsevice.api.AdminServiceApi;
 import lucky.apollo.portal.entity.bo.ReleaseHistoryInfo;
 import lucky.apollo.portal.resolver.PermissionValidator;
 import lucky.apollo.portal.utils.RelativeDateFormatUtils;
@@ -44,11 +44,7 @@ public class ReleaseHistoryController {
                                                                     @RequestParam(value = "page", defaultValue = "0") int page,
                                                                     @RequestParam(value = "size", defaultValue = "10") int size) {
 
-        if (permissionValidator.shouldHideConfigToCurrentUser(appId, namespaceName)) {
-            return Collections.emptyList();
-        }
-
-        PageDTO<ReleaseHistoryDTO> result = adminServiceApi.findReleaseHistoriesByNamespace(appId, namespaceName, page, size);
+        PageDTO<ReleaseHistoryDTO> result = adminServiceApi.findReleaseHistoriesByNamespace(appId, namespaceName, clusterName, page, size);
         if (result == null || !result.hasContent()) {
             return Collections.emptyList();
         }

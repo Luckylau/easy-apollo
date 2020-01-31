@@ -40,4 +40,6 @@ public interface ReleaseService {
                                   String operator, boolean isEmergencyPublish, Set<String> grayDelKeys);
 
     int batchDelete(String appId, String clusterName, String namespaceName, String operator);
+
+    ReleasePO rollback(long releaseId, String operator);
 }

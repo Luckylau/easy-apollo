@@ -1,5 +1,6 @@
 package lucky.apollo.adminservice;
 
+import lucky.apollo.common.ApolloCommonConfig;
 import lucky.apollo.core.ApolloCoreConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,8 +17,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableAspectJAutoProxy
 @EnableEurekaClient
-@ComponentScan(basePackageClasses = {ApolloCoreConfig.class,
-        AdminServiceApplication.class})
+@ComponentScan(basePackageClasses = {
+        AdminServiceApplication.class,
+        ApolloCoreConfig.class,
+        ApolloCommonConfig.class})
 public class AdminServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(AdminServiceApplication.class, args);

@@ -20,6 +20,8 @@ public class PermissionType {
 
     public static final String CREATE_NAMESPACE = "CreateNamespace";
 
+    public static final String CREATE_CLUSTER = "CreateCluster";
+
 
     /**
      * 分配用户权限的权限

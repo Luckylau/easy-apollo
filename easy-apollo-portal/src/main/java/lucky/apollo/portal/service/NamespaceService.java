@@ -13,17 +13,17 @@ import java.util.List;
 public interface NamespaceService {
     NamespaceDTO createNamespace(NamespaceDTO namespace);
 
-    void deleteNamespace(String appId, String namespaceName);
+    void deleteNamespace(String appId, String clusterName, String namespaceName);
 
-    NamespaceDTO loadNamespaceBaseInfo(String appId, String namespaceName);
+    NamespaceDTO loadNamespaceBaseInfo(String appId, String clusterName, String namespaceName);
 
-    List<NamespaceInfo> findNamespaceBOs(String appId);
+    List<NamespaceInfo> findNamespaceBOs(String appId, String cluster);
 
-    List<NamespaceDTO> findNamespaces(String appId);
+    List<NamespaceDTO> findNamespaces(String appId, String cluster);
 
-    NamespaceInfo loadNamespaceBO(String appId, String namespaceName);
+    NamespaceInfo loadNamespaceBO(String appId, String clusterName, String namespaceName);
 
-    boolean namespaceHasInstances(String appId, String namespaceName);
+    boolean namespaceHasInstances(String appId, String clusterName, String namespaceName);
 
     void assignNamespaceRoleToOperator(String appId, String namespaceName, String operator);
 }

@@ -61,28 +61,54 @@ public class NamespaceUnlockAspect {
     }
 
 
-    //create item
+    /**
+     * create item
+     *
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param item
+     */
     @After("@annotation(lucky.apollo.adminservice.aop.PreAcquireNamespaceLock) && args(appId, clusterName, namespaceName, item, ..)")
     public void requireLockAdvice(String appId, String clusterName, String namespaceName,
                                   ItemDTO item) {
         tryUnlock(namespaceService.findOne(appId, clusterName, namespaceName));
     }
 
-    //update item
+    /**
+     * update item
+     *
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param itemId
+     * @param item
+     */
     @After("@annotation(lucky.apollo.adminservice.aop.PreAcquireNamespaceLock) && args(appId, clusterName, namespaceName, itemId, item, ..)")
     public void requireLockAdvice(String appId, String clusterName, String namespaceName, long itemId,
                                   ItemDTO item) {
         tryUnlock(namespaceService.findOne(appId, clusterName, namespaceName));
     }
 
-    //update by change set
+    /**
+     * update by change set
+     *
+     * @param appId
+     * @param clusterName
+     * @param namespaceName
+     * @param changeSet
+     */
     @After("@annotation(lucky.apollo.adminservice.aop.PreAcquireNamespaceLock) && args(appId, clusterName, namespaceName, changeSet, ..)")
     public void requireLockAdvice(String appId, String clusterName, String namespaceName,
                                   ItemChangeSetsDTO changeSet) {
         tryUnlock(namespaceService.findOne(appId, clusterName, namespaceName));
     }
 
-    //delete item
+    /**
+     * delete item
+     * @param itemId
+     * @param operator
+     */
     @After("@annotation(lucky.apollo.adminservice.aop.PreAcquireNamespaceLock) && args(itemId, operator, ..)")
     public void requireLockAdvice(long itemId, String operator) {
         ItemPO item = itemService.findOne(itemId);
@@ -94,9 +120,9 @@ public class NamespaceUnlockAspect {
 
     private void tryUnlock(NamespacePO namespace) {
 
-        if (!isModified(namespace)) {
+        /*if (!isModified(namespace)) {
             namespaceLockService.unlock(namespace.getId());
-        }
+        }*/
 
     }
 

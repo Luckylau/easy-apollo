@@ -31,7 +31,7 @@ public interface InstanceConfigRepository extends PagingAndSortingRepository<Ins
             String appId, String clusterName, String namespaceName, Date validDate, Set<String> releaseKey);
 
     @Modifying
-    @Query("delete from InstanceConfig  where ConfigAppId=?1 and ConfigClusterName=?2 and ConfigNamespaceName = ?3")
+    @Query(value = "delete from InstanceConfig  where ConfigAppId=?1 and ConfigClusterName=?2 and ConfigNamespaceName = ?3", nativeQuery = true)
     int batchDelete(String appId, String clusterName, String namespaceName);
 
     @Query(

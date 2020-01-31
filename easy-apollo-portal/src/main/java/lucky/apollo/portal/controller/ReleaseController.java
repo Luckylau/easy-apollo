@@ -1,18 +1,13 @@
 package lucky.apollo.portal.controller;
 
-import com.google.common.base.Objects;
-import com.google.gson.Gson;
-import lucky.apollo.common.constant.GsonType;
 import lucky.apollo.common.entity.dto.ReleaseDTO;
 import lucky.apollo.common.exception.NotFoundException;
-import lucky.apollo.portal.api.AdminServiceApi;
-import lucky.apollo.portal.constant.ChangeType;
-import lucky.apollo.portal.entity.bo.KeyValueInfo;
 import lucky.apollo.portal.entity.bo.ReleaseBO;
 import lucky.apollo.portal.entity.model.NamespaceReleaseModel;
 import lucky.apollo.portal.entity.vo.ReleaseCompareResult;
 import lucky.apollo.portal.listener.ConfigPublishEvent;
 import lucky.apollo.portal.resolver.PermissionValidator;
+import lucky.apollo.portal.service.ReleaseService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.*;
-
-;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @Author luckylau
@@ -35,15 +30,13 @@ import java.util.*;
 @RestController
 public class ReleaseController {
 
-    private static final Gson gson = new Gson();
-
-    private final AdminServiceApi adminServiceApi;
+    private final ReleaseService releaseService;
     private final ApplicationEventPublisher publisher;
     private final PermissionValidator permissionValidator;
 
 
-    public ReleaseController(AdminServiceApi adminServiceApi, ApplicationEventPublisher publisher, PermissionValidator permissionValidator) {
-        this.adminServiceApi = adminServiceApi;
+    public ReleaseController(ReleaseService releaseService, ApplicationEventPublisher publisher, PermissionValidator permissionValidator) {
+        this.releaseService = releaseService;
         this.publisher = publisher;
         this.permissionValidator = permissionValidator;
     }
@@ -55,10 +48,9 @@ public class ReleaseController {
                                     @PathVariable String namespaceName, @RequestBody NamespaceReleaseModel model) {
         model.setAppId(appId);
         model.setNamespaceName(namespaceName);
+        model.setClusterName(clusterName);
 
-        ReleaseDTO createdRelease = adminServiceApi.createRelease(appId, namespaceName,
-                model.getReleaseTitle(), model.getReleaseComment(),
-                model.getReleasedBy(), model.getIsEmergencyPublish());
+        ReleaseDTO createdRelease = releaseService.publish(model);
 
         ConfigPublishEvent event = ConfigPublishEvent.instance();
         event.withAppId(appId)
@@ -78,10 +70,9 @@ public class ReleaseController {
                                         @RequestBody NamespaceReleaseModel model) {
         model.setAppId(appId);
         model.setNamespaceName(namespaceName);
+        model.setClusterName(clusterName);
 
-        ReleaseDTO createdRelease = adminServiceApi.createRelease(appId, namespaceName,
-                model.getReleaseTitle(), model.getReleaseComment(),
-                model.getReleasedBy(), model.getIsEmergencyPublish());
+        ReleaseDTO createdRelease = releaseService.publish(model);
 
         ConfigPublishEvent event = ConfigPublishEvent.instance();
         event.withAppId(appId)
@@ -101,34 +92,7 @@ public class ReleaseController {
                                            @PathVariable String namespaceName,
                                            @Valid @PositiveOrZero(message = "page should be positive or 0") @RequestParam(defaultValue = "0") int page,
                                            @Valid @Positive(message = "size should be positive number") @RequestParam(defaultValue = "5") int size) {
-        if (permissionValidator.shouldHideConfigToCurrentUser(appId, namespaceName)) {
-            return Collections.emptyList();
-        }
-
-        List<ReleaseDTO> releaseDTOs = adminServiceApi.findAllReleases(appId, namespaceName, page, size);
-
-        if (CollectionUtils.isEmpty(releaseDTOs)) {
-            return Collections.emptyList();
-        }
-
-        List<ReleaseBO> releases = new LinkedList<>();
-        for (ReleaseDTO releaseDTO : releaseDTOs) {
-            ReleaseBO release = new ReleaseBO();
-            release.setBaseInfo(releaseDTO);
-
-            Set<KeyValueInfo> kvEntities = new LinkedHashSet<>();
-            Map<String, String> configurations = gson.fromJson(releaseDTO.getConfigurations(), GsonType.CONFIG);
-            Set<Map.Entry<String, String>> entries = configurations.entrySet();
-            for (Map.Entry<String, String> entry : entries) {
-                kvEntities.add(new KeyValueInfo(entry.getKey(), entry.getValue()));
-            }
-            release.setItems(kvEntities);
-            //为了减少数据量
-            releaseDTO.setConfigurations("");
-            releases.add(release);
-        }
-
-        return releases;
+        return releaseService.findAllReleases(appId, namespaceName, clusterName, page, size);
     }
 
     @GetMapping(value = "/apps/{appId}/envs/{env}/clusters/{clusterName}/namespaces/{namespaceName}/releases/active")
@@ -138,12 +102,7 @@ public class ReleaseController {
                                                @PathVariable String namespaceName,
                                                @Valid @PositiveOrZero(message = "page should be positive or 0") @RequestParam(defaultValue = "0") int page,
                                                @Valid @Positive(message = "size should be positive number") @RequestParam(defaultValue = "5") int size) {
-
-        if (permissionValidator.shouldHideConfigToCurrentUser(appId, namespaceName)) {
-            return Collections.emptyList();
-        }
-
-        return adminServiceApi.findActiveReleases(appId, namespaceName, page, size);
+        return releaseService.findActiveReleases(appId, namespaceName, clusterName, page, size);
     }
 
     @GetMapping(value = "/envs/{env}/releases/compare")
@@ -151,52 +110,8 @@ public class ReleaseController {
                                                @RequestParam long baseReleaseId,
                                                @RequestParam long toCompareReleaseId) {
 
-        ReleaseDTO baseRelease = null;
-        ReleaseDTO toCompareRelease = null;
-        if (baseReleaseId != 0) {
-            baseRelease = adminServiceApi.loadRelease(baseReleaseId);
-        }
+        return releaseService.compare(baseReleaseId, toCompareReleaseId);
 
-        if (toCompareReleaseId != 0) {
-            toCompareRelease = adminServiceApi.loadRelease(toCompareReleaseId);
-        }
-
-        Map<String, String> baseReleaseConfiguration = baseRelease == null ? new HashMap<>() :
-                gson.fromJson(baseRelease.getConfigurations(), GsonType.CONFIG);
-        Map<String, String> toCompareReleaseConfiguration = toCompareRelease == null ? new HashMap<>() :
-                gson.fromJson(toCompareRelease.getConfigurations(),
-                        GsonType.CONFIG);
-
-        ReleaseCompareResult compareResult = new ReleaseCompareResult();
-
-        //added and modified in firstRelease
-        for (Map.Entry<String, String> entry : baseReleaseConfiguration.entrySet()) {
-            String key = entry.getKey();
-            String firstValue = entry.getValue();
-            String secondValue = toCompareReleaseConfiguration.get(key);
-            //added
-            if (secondValue == null) {
-                compareResult.addEntityPair(ChangeType.DELETED, new KeyValueInfo(key, firstValue),
-                        new KeyValueInfo(key, null));
-            } else if (!Objects.equal(firstValue, secondValue)) {
-                compareResult.addEntityPair(ChangeType.MODIFIED, new KeyValueInfo(key, firstValue),
-                        new KeyValueInfo(key, secondValue));
-            }
-
-        }
-
-        //deleted in firstRelease
-        for (Map.Entry<String, String> entry : toCompareReleaseConfiguration.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (baseReleaseConfiguration.get(key) == null) {
-                compareResult
-                        .addEntityPair(ChangeType.ADDED, new KeyValueInfo(key, ""), new KeyValueInfo(key, value));
-            }
-
-        }
-
-        return compareResult;
     }
 
 
@@ -205,7 +120,7 @@ public class ReleaseController {
                          @PathVariable long releaseId) {
         Set<Long> releaseIds = new HashSet<>(1);
         releaseIds.add(releaseId);
-        List<ReleaseDTO> releases = adminServiceApi.findReleaseByIds(releaseIds);
+        List<ReleaseDTO> releases = releaseService.findReleaseByIds(releaseIds);
         if (CollectionUtils.isEmpty(releases)) {
             throw new NotFoundException("release not found");
         }
@@ -220,7 +135,7 @@ public class ReleaseController {
             throw new AccessDeniedException("Access is denied");
         }
 
-        adminServiceApi.rollback(releaseId);
+        releaseService.rollback(releaseId);
 
         ConfigPublishEvent event = ConfigPublishEvent.instance();
         event.withAppId(release.getAppId())

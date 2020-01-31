@@ -22,5 +22,13 @@ public interface NamespaceService {
     void instanceOfAppNamespaces(String appId, String clusterName, String createBy);
 
     List<NamespacePO> findByAppIdAndNamespaceName(String appId, String namespaceName);
+
+    List<NamespacePO> findNamespaces(String appId, String clusterName);
+
+    NamespacePO findChildNamespace(String appId, String parentClusterName, String namespaceName);
+
+    void deleteByAppIdAndClusterName(String appId, String clusterName, String operator);
+
+    NamespacePO findParentNamespace(NamespacePO namespacePO);
 }
 

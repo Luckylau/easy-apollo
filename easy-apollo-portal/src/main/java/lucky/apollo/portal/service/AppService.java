@@ -2,6 +2,7 @@ package lucky.apollo.portal.service;
 
 import lucky.apollo.common.entity.dto.PageDTO;
 import lucky.apollo.common.entity.po.AppPO;
+import lucky.apollo.portal.entity.vo.EnvClusterInfo;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -31,4 +32,6 @@ public interface AppService {
     AppPO deleteAppInLocal(String appId);
 
     AppPO load(String appId);
+
+    EnvClusterInfo createEnvNavNode(String appId);
 }

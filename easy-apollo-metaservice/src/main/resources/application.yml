@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: easy-apollo-metaservice
+  profiles:
+    active: dev
+  
+server:
+  port: 7070

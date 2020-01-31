@@ -32,7 +32,7 @@ public class PortalConfig extends RefreshableConfig implements ApplicationContex
 
     private Gson gson = new Gson();
 
-    private static ApplicationContext applicationContext = null;
+    private ApplicationContext applicationContext = null;
 
     private final PortalPropertySourceRefresher portalPropertySourceRefresher;
 

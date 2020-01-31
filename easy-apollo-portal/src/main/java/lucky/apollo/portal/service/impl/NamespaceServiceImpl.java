@@ -3,7 +3,6 @@ package lucky.apollo.portal.service.impl;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import lucky.apollo.common.constant.ConfigFileFormat;
 import lucky.apollo.common.constant.GsonType;
 import lucky.apollo.common.entity.dto.ItemDTO;
 import lucky.apollo.common.entity.dto.NamespaceDTO;
@@ -11,16 +10,14 @@ import lucky.apollo.common.entity.dto.ReleaseDTO;
 import lucky.apollo.common.entity.po.AppNamespacePO;
 import lucky.apollo.common.exception.BadRequestException;
 import lucky.apollo.common.utils.BeanUtils;
-import lucky.apollo.portal.api.AdminServiceApi;
+import lucky.apollo.portal.adminsevice.api.AdminServiceApi;
 import lucky.apollo.portal.constant.RoleType;
 import lucky.apollo.portal.entity.bo.ItemInfo;
 import lucky.apollo.portal.entity.bo.NamespaceInfo;
-import lucky.apollo.portal.service.AppNamespaceService;
-import lucky.apollo.portal.service.NamespaceService;
-import lucky.apollo.portal.service.RolePermissionService;
-import lucky.apollo.portal.service.UserService;
+import lucky.apollo.portal.service.*;
 import lucky.apollo.portal.utils.RoleUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -52,6 +49,10 @@ public class NamespaceServiceImpl implements NamespaceService {
     @Autowired
     private RolePermissionService rolePermissionService;
 
+    @Lazy
+    @Autowired
+    private NamespaceBranchService namespaceBranchService;
+
 
     @Override
     public NamespaceDTO createNamespace(NamespaceDTO namespace) {
@@ -67,11 +68,20 @@ public class NamespaceServiceImpl implements NamespaceService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteNamespace(String appId, String namespaceName) {
+    public void deleteNamespace(String appId, String clusterName, String namespaceName) {
 
-        if (namespaceHasInstances(appId, namespaceName)) {
+        if (namespaceHasInstances(appId, clusterName, namespaceName)) {
             throw new BadRequestException(
                     "Can not delete namespace because namespace has active instances");
+        }
+
+        //2. check child namespace has not instances
+        NamespaceDTO childNamespace = namespaceBranchService
+                .findBranchBaseInfo(appId, clusterName, namespaceName);
+        if (childNamespace != null &&
+                namespaceHasInstances(appId, clusterName, namespaceName)) {
+            throw new BadRequestException(
+                    "Can not delete namespace because namespace's branch has active instances");
         }
 
         String operator = userService.getCurrentUser().getUserId();
@@ -80,8 +90,8 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
     @Override
-    public NamespaceDTO loadNamespaceBaseInfo(String appId, String namespaceName) {
-        NamespaceDTO namespace = adminServiceApi.loadNamespace(appId, namespaceName);
+    public NamespaceDTO loadNamespaceBaseInfo(String appId, String clusterName, String namespaceName) {
+        NamespaceDTO namespace = adminServiceApi.loadNamespace(appId, namespaceName, clusterName);
         if (namespace == null) {
             throw new BadRequestException("namespaces not exist");
         }
@@ -92,9 +102,9 @@ public class NamespaceServiceImpl implements NamespaceService {
      * load cluster all namespace info with items
      */
     @Override
-    public List<NamespaceInfo> findNamespaceBOs(String appId) {
+    public List<NamespaceInfo> findNamespaceBOs(String appId, String cluster) {
 
-        List<NamespaceDTO> namespaces = adminServiceApi.findNamespace(appId);
+        List<NamespaceDTO> namespaces = adminServiceApi.findNamespace(appId, cluster);
         if (namespaces == null || namespaces.size() == 0) {
             throw new BadRequestException("namespaces not exist");
         }
@@ -117,14 +127,14 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
     @Override
-    public List<NamespaceDTO> findNamespaces(String appId) {
-        return adminServiceApi.findNamespace(appId);
+    public List<NamespaceDTO> findNamespaces(String appId, String cluster) {
+        return adminServiceApi.findNamespace(appId, cluster);
     }
 
     @Override
-    public NamespaceInfo loadNamespaceBO(String appId,
+    public NamespaceInfo loadNamespaceBO(String appId, String clusterName,
                                          String namespaceName) {
-        NamespaceDTO namespace = adminServiceApi.loadNamespace(appId, namespaceName);
+        NamespaceDTO namespace = adminServiceApi.loadNamespace(appId, namespaceName, clusterName);
         if (namespace == null) {
             throw new BadRequestException("namespaces not exist");
         }
@@ -132,7 +142,7 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
     @Override
-    public boolean namespaceHasInstances(String appId, String namespaceName) {
+    public boolean namespaceHasInstances(String appId, String clusterName, String namespaceName) {
         return adminServiceApi.getInstanceCountByNamespace(appId, namespaceName) > 0;
     }
 
@@ -142,8 +152,8 @@ public class NamespaceServiceImpl implements NamespaceService {
         namespaceInfo.setBaseInfo(namespace);
 
         String appId = namespace.getAppId();
-        String clusterName = namespace.getClusterName();
         String namespaceName = namespace.getNamespaceName();
+        String cluster = namespace.getClusterName();
 
         fillAppNamespaceProperties(namespaceInfo);
 
@@ -153,13 +163,13 @@ public class NamespaceServiceImpl implements NamespaceService {
         //latest Release
         ReleaseDTO latestRelease;
         Map<String, String> releaseItems = new HashMap<>();
-        latestRelease = adminServiceApi.loadLatestRelease(appId, namespaceName);
+        latestRelease = adminServiceApi.loadLatestRelease(appId, namespaceName, cluster);
         if (latestRelease != null) {
             releaseItems = gson.fromJson(latestRelease.getConfigurations(), GsonType.CONFIG);
         }
 
         //not Release config items
-        List<ItemDTO> items = adminServiceApi.findItems(appId, namespaceName);
+        List<ItemDTO> items = adminServiceApi.findItems(appId, cluster, namespaceName);
         int modifiedItemCnt = 0;
         for (ItemDTO itemDTO : items) {
 
@@ -189,20 +199,9 @@ public class NamespaceServiceImpl implements NamespaceService {
         AppNamespacePO appNamespace =
                 appNamespaceService
                         .findByAppIdAndName(namespaceDTO.getAppId(), namespaceDTO.getNamespaceName());
-        String format;
-        boolean isPublic = false;
-        if (appNamespace == null) {
-            //dirty data
-            format = ConfigFileFormat.Properties.getValue();
-            // set to true, because public namespace allowed to delete by user
-            isPublic = true;
-        } else {
-            format = appNamespace.getFormat();
-            namespace.setParentAppId(appNamespace.getAppId());
-            namespace.setComment(appNamespace.getComment());
-        }
-        namespace.setFormat(format);
-        namespace.setIsPublic(isPublic);
+        namespace.setParentAppId(appNamespace.getAppId());
+        namespace.setComment(appNamespace.getComment());
+        namespace.setFormat(appNamespace.getFormat());
     }
 
     private List<ItemInfo> parseDeletedItems(List<ItemDTO> newItems, Map<String, String> releaseItems) {
@@ -237,10 +236,8 @@ public class NamespaceServiceImpl implements NamespaceService {
         String newValue = itemDTO.getValue();
         String oldValue = releaseItems.get(key);
         //new item or modified
-        if (StringUtils.isEmpty(key)) {
-            return itemInfo;
-        }
-        if (!newValue.equals(oldValue)) {
+        boolean oldValueIsNullOrNotEqNewValue = StringUtils.isEmpty(oldValue) || !newValue.equals(oldValue);
+        if (!StringUtils.isEmpty(key) && oldValueIsNullOrNotEqNewValue) {
             itemInfo.setModified(true);
             itemInfo.setOldValue(oldValue == null ? "" : oldValue);
             itemInfo.setNewValue(newValue);

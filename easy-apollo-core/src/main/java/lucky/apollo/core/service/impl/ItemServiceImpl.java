@@ -134,7 +134,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByNamespaceIdAndDataChangeLastModifiedTimeGreaterThan(namespaceId, date);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public ItemPO save(ItemPO entity) {
         checkItemKeyLength(entity.getKey());
@@ -142,7 +142,7 @@ public class ItemServiceImpl implements ItemService {
         //protection
         entity.setId(0);
 
-        if (entity.getLineNum() == 0) {
+        if (entity.getLineNum() == null) {
             ItemPO lastItem = findLastOne(entity.getNamespaceId());
             int lineNum = lastItem == null ? 1 : lastItem.getLineNum() + 1;
             entity.setLineNum(lineNum);
@@ -183,6 +183,6 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private int getItemValueLengthLimit(long namespaceId) {
-        return 0;
+        return Integer.MAX_VALUE;
     }
 }
