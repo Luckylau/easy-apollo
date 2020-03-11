@@ -1,7 +1,10 @@
 package lucky.apollo.client.foundation;
 
 import lombok.extern.slf4j.Slf4j;
+import lucky.apollo.client.foundation.spi.ApplicationProvider;
+import lucky.apollo.client.foundation.spi.NetworkProvider;
 import lucky.apollo.client.foundation.spi.ProviderManager;
+import lucky.apollo.client.foundation.spi.ServerProvider;
 import lucky.apollo.client.foundation.spi.impl.NullProviderManager;
 
 /**
@@ -35,6 +38,33 @@ public abstract class Foundation {
             s_manager = new NullProviderManager();
             log.error("Initialize ProviderManager failed.", ex);
             return s_manager;
+        }
+    }
+
+    public static ApplicationProvider app() {
+        try {
+            return getManager().provider(ApplicationProvider.class);
+        } catch (Exception ex) {
+            log.error("Initialize ApplicationProvider failed.", ex);
+            return NullProviderManager.provider;
+        }
+    }
+
+    public static NetworkProvider net() {
+        try {
+            return getManager().provider(NetworkProvider.class);
+        } catch (Exception ex) {
+            log.error("Initialize NetworkProvider failed.", ex);
+            return NullProviderManager.provider;
+        }
+    }
+
+    public static ServerProvider server() {
+        try {
+            return getManager().provider(ServerProvider.class);
+        } catch (Exception ex) {
+            log.error("Initialize ServerProvider failed.", ex);
+            return NullProviderManager.provider;
         }
     }
 }

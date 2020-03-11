@@ -28,4 +28,21 @@ public class ApolloInjector {
 
         return s_injector;
     }
+
+    public static <T> T getInstance(Class<T> clazz) {
+        try {
+            return getInjector().getInstance(clazz);
+        } catch (Throwable ex) {
+            throw new ApolloConfigException(String.format("Unable to load instance for type %s!", clazz.getName()), ex);
+        }
+    }
+
+    public static <T> T getInstance(Class<T> clazz, String name) {
+        try {
+            return getInjector().getInstance(clazz, name);
+        } catch (Throwable ex) {
+            throw new ApolloConfigException(
+                    String.format("Unable to load instance for type %s and name %s !", clazz.getName(), name), ex);
+        }
+    }
 }

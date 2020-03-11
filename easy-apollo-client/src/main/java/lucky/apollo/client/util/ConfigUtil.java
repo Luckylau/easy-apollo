@@ -2,8 +2,11 @@ package lucky.apollo.client.util;
 
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.RateLimiter;
-import jdk.internal.util.EnvUtils;
+import lucky.apollo.client.foundation.Foundation;
+import lucky.apollo.client.metaservice.MetaDomainConsts;
 import lucky.apollo.common.constant.ConfigConsts;
+import lucky.apollo.common.constant.Env;
+import lucky.apollo.common.utils.EnvUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +95,7 @@ public class ConfigUtil {
     public String getAppId() {
         String appId = Foundation.app().getAppId();
         if (Strings.isNullOrEmpty(appId)) {
-            appId = ConfigConsts.NO_APPID_PLACEHOLDER;
+            appId = ConfigConsts.NO_APP_ID_PLACEHOLDER;
             if (warnLogRateLimiter.tryAcquire()) {
                 logger.warn(
                         "app.id is not set, please make sure it is set in classpath:/META-INF/app.properties, now apollo will only load public namespace configurations!");
@@ -264,15 +267,6 @@ public class ConfigUtil {
         }
 
         return cacheRoot;
-    }
-
-    public boolean isInLocalMode() {
-        try {
-            return Env.LOCAL == getApolloEnv();
-        } catch (Throwable ex) {
-            //ignore
-        }
-        return false;
     }
 
     public boolean isOSWindows() {

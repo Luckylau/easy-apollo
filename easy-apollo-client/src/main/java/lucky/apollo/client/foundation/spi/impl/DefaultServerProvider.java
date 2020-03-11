@@ -28,22 +28,22 @@ public class DefaultServerProvider implements ServerProvider {
 
     @Override
     public String getEnvType() {
-        return null;
+        return m_env;
     }
 
     @Override
     public boolean isEnvTypeSet() {
-        return false;
+        return m_env != null;
     }
 
     @Override
     public String getDataCenter() {
-        return null;
+        return m_dc;
     }
 
     @Override
     public boolean isDataCenterSet() {
-        return false;
+        return m_dc != null;
     }
 
     @Override
@@ -66,12 +66,21 @@ public class DefaultServerProvider implements ServerProvider {
 
     @Override
     public Class<? extends Provider> getType() {
-        return null;
+        return ServerProvider.class;
     }
 
     @Override
     public String getProperty(String name, String defaultValue) {
-        return null;
+        if ("env".equalsIgnoreCase(name)) {
+            String val = getEnvType();
+            return val == null ? defaultValue : val;
+        } else if ("dc".equalsIgnoreCase(name)) {
+            String val = getDataCenter();
+            return val == null ? defaultValue : val;
+        } else {
+            String val = m_serverProperties.getProperty(name, defaultValue);
+            return val == null ? defaultValue : val.trim();
+        }
     }
 
     @Override
@@ -92,4 +101,67 @@ public class DefaultServerProvider implements ServerProvider {
             log.error("Initialize DefaultServerProvider failed.", ex);
         }
     }
+
+    private void initEnvType() {
+        // 1. Try to get environment from JVM system property
+        m_env = System.getProperty("env");
+        if (!Utils.isBlank(m_env)) {
+            m_env = m_env.trim();
+            log.info("Environment is set to [{}] by JVM system property 'env'.", m_env);
+            return;
+        }
+
+        // 2. Try to get environment from OS environment variable
+        m_env = System.getenv("ENV");
+        if (!Utils.isBlank(m_env)) {
+            m_env = m_env.trim();
+            log.info("Environment is set to [{}] by OS env variable 'ENV'.", m_env);
+            return;
+        }
+
+        // 3. Try to get environment from file "server.properties"
+        m_env = m_serverProperties.getProperty("env");
+        if (!Utils.isBlank(m_env)) {
+            m_env = m_env.trim();
+            log.info("Environment is set to [{}] by property 'env' in server.properties.", m_env);
+            return;
+        }
+
+        // 4. Set environment to null.
+        m_env = null;
+        log.info("Environment is set to null. Because it is not available in either (1) JVM system property 'env', (2) OS env variable 'ENV' nor (3) property 'env' from the properties InputStream.");
+    }
+
+    private void initDataCenter() {
+        // 1. Try to get environment from JVM system property
+        m_dc = System.getProperty("idc");
+        if (!Utils.isBlank(m_dc)) {
+            m_dc = m_dc.trim();
+            log.info("Data Center is set to [{}] by JVM system property 'idc'.", m_dc);
+            return;
+        }
+
+        // 2. Try to get idc from OS environment variable
+        m_dc = System.getenv("IDC");
+        if (!Utils.isBlank(m_dc)) {
+            m_dc = m_dc.trim();
+            log.info("Data Center is set to [{}] by OS env variable 'IDC'.", m_dc);
+            return;
+        }
+
+        // 3. Try to get idc from from file "server.properties"
+        m_dc = m_serverProperties.getProperty("idc");
+        if (!Utils.isBlank(m_dc)) {
+            m_dc = m_dc.trim();
+            log.info("Data Center is set to [{}] by property 'idc' in server.properties.", m_dc);
+            return;
+        }
+
+        // 4. Set Data Center to null.
+        m_dc = null;
+        log.debug("Data Center is set to null. Because it is not available in either (1) JVM system property 'idc', (2) OS env variable 'IDC' nor (3) property 'idc' from the properties InputStream.");
+    }
+
+
+
 }

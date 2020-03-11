@@ -16,4 +16,7 @@ public class ConfigConsts {
     public static final long NOTIFICATION_ID_PLACEHOLDER = -1;
 
     public static final String NO_APP_ID_PLACEHOLDER = "ApolloNoAppIdPlaceHolder";
+
+    public static final String APOLLO_CLUSTER_KEY = "apollo.cluster";
+
 }
