@@ -18,7 +18,9 @@ import java.util.Properties;
 @Slf4j
 public class DefaultApplicationProvider implements ApplicationProvider {
 
-    public static final String APP_PROPERTIES_CLASSPATH = "/META-INF/app.properties";
+    private static final String APP_PROPERTIES_CLASSPATH = "/META-INF/app.properties";
+
+    private static final String APP_ID = "app.id";
     private Properties m_appProperties = new Properties();
 
     private String m_appId;
@@ -26,12 +28,12 @@ public class DefaultApplicationProvider implements ApplicationProvider {
 
     @Override
     public String getAppId() {
-        return null;
+        return m_appId;
     }
 
     @Override
     public boolean isAppIdSet() {
-        return false;
+        return !Utils.isBlank(m_appId);
     }
 
     @Override
@@ -82,12 +84,18 @@ public class DefaultApplicationProvider implements ApplicationProvider {
 
     @Override
     public Class<? extends Provider> getType() {
-        return null;
+        return ApplicationProvider.class;
     }
 
     @Override
     public String getProperty(String name, String defaultValue) {
-        return null;
+        if (APP_ID.equals(name)) {
+            String val = getAppId();
+            return val == null ? defaultValue : val;
+        } else {
+            String val = m_appProperties.getProperty(name, defaultValue);
+            return val == null ? defaultValue : val;
+        }
     }
 
     @Override

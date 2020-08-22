@@ -40,11 +40,40 @@ public class DefaultProviderManager implements ProviderManager {
 
     @Override
     public String getProperty(String name, String defaultValue) {
-        return null;
+        for (Provider provider : m_providers.values()) {
+            String value = provider.getProperty(name, null);
+
+            if (value != null) {
+                return value;
+            }
+        }
+
+        return defaultValue;
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends Provider> T provider(Class<T> clazz) {
-        return null;
+        Provider provider = m_providers.get(clazz);
+
+        if (provider != null) {
+            return (T) provider;
+        } else {
+            log.error("No provider [{}] found in DefaultProviderManager, please make sure it is registered in DefaultProviderManager ",
+                    clazz.getName());
+            return (T) NullProviderManager.provider;
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(512);
+        if (null != m_providers) {
+            for (Map.Entry<Class<? extends Provider>, Provider> entry : m_providers.entrySet()) {
+                sb.append(entry.getValue()).append("\n");
+            }
+        }
+        sb.append("(DefaultProviderManager)").append("\n");
+        return sb.toString();
     }
 }
