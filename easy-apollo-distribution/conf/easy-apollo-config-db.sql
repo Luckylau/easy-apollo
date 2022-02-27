@@ -507,6 +507,6 @@ CREATE TABLE `ServerConfig` (
 # ------------------------------------------------------------
 INSERT INTO `ServerConfig` (`Key`, `Cluster`, `Value`, `Comment`)
 VALUES
-    ('eureka.service.url', 'default', 'http://localhost:8080/eureka/', 'Eureka服务Url，多个service以英文逗号分隔'),
+    ('eureka.service.url', 'default', 'http://localhost:7070/eureka/', 'Eureka服务Url，多个service以英文逗号分隔'),
     ('namespace.lock.switch', 'default', 'false', '一次发布只能有一个人修改开关'),
     ('config-service.cache.enabled', 'default', 'false', 'ConfigService是否开启缓存，开启后能提高性能，但是会增大内存消耗！');
