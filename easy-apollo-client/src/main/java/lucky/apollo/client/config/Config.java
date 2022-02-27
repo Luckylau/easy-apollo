@@ -29,7 +29,7 @@ public interface Config {
      * @param defaultValue the default value when key is not found or any error occurred
      * @return the property value as integer
      */
-     Integer getIntProperty(String key, Integer defaultValue);
+    Integer getIntProperty(String key, Integer defaultValue);
 
     /**
      * Return the long property value with the given key, or {@code defaultValue} if the key doesn't
@@ -39,7 +39,7 @@ public interface Config {
      * @param defaultValue the default value when key is not found or any error occurred
      * @return the property value as long
      */
-     Long getLongProperty(String key, Long defaultValue);
+    Long getLongProperty(String key, Long defaultValue);
 
     /**
      * Return the short property value with the given key, or {@code defaultValue} if the key doesn't
@@ -179,7 +179,7 @@ public interface Config {
      * @param interestedKeys the keys interested by the listener
      * @since 1.0.0
      */
-     void addChangeListener(ConfigChangeListener listener, Set<String> interestedKeys);
+    void addChangeListener(ConfigChangeListener listener, Set<String> interestedKeys);
 
 
     /**
@@ -196,7 +196,7 @@ public interface Config {
      *
      * @return the property names
      */
-     Set<String> getPropertyNames();
+    Set<String> getPropertyNames();
 
     /**
      * Return the user-defined property value with the given key, or {@code defaultValue} if the key doesn't exist.
@@ -208,7 +208,7 @@ public interface Config {
      * @return the property value
      * @since 1.1.0
      */
-     <T> T getProperty(String key, Function<String, T> function, T defaultValue);
+    <T> T getProperty(String key, Function<String, T> function, T defaultValue);
 
     /**
      * Return the config's source type, i.e. where is the config loaded from
@@ -216,5 +216,5 @@ public interface Config {
      * @return the config's source type
      * @since 1.1.0
      */
-     ConfigSourceType getSourceType();
+    ConfigSourceType getSourceType();
 }

@@ -12,6 +12,7 @@ public class XmlConfigFile extends PlainTextConfigFile {
                          ConfigRepository configRepository) {
         super(namespace, configRepository);
     }
+
     @Override
     public ConfigFileFormat getConfigFileFormat() {
         return ConfigFileFormat.XML;

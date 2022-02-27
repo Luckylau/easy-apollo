@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.client.config.AbstractConfig;
-import lucky.apollo.client.config.ConfigChangeListener;
 import lucky.apollo.client.config.ConfigRepository;
 import lucky.apollo.client.config.RepositoryChangeListener;
 import lucky.apollo.client.constant.ConfigSourceType;

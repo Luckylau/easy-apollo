@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -50,24 +49,25 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
     private static final Escaper pathEscaper = UrlEscapers.urlPathSegmentEscaper();
     private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
+    private final static ScheduledExecutorService m_executorService;
+
+    static {
+        m_executorService = new ScheduledThreadPoolExecutor(1,
+                ApolloThreadFactory.create("RemoteConfigRepository", true));
+    }
+
     private final ConfigServiceLocator m_serviceLocator;
     private final HttpUtil m_httpUtil;
     private final ConfigUtil m_configUtil;
     private final RemoteConfigLongPollService remoteConfigLongPollService;
-    private volatile AtomicReference<ApolloConfigDTO> m_configCache;
     private final String m_namespace;
-    private final static ScheduledExecutorService m_executorService;
     private final AtomicReference<ServiceDTO> m_longPollServiceDto;
     private final AtomicReference<ApolloNotificationMessageDTO> m_remoteMessages;
     private final RateLimiter m_loadConfigRateLimiter;
     private final AtomicBoolean m_configNeedForceRefresh;
     private final SchedulePolicy m_loadConfigFailSchedulePolicy;
     private final Gson gson;
-
-    static {
-        m_executorService = new ScheduledThreadPoolExecutor(1,
-                ApolloThreadFactory.create("RemoteConfigRepository", true));
-    }
+    private volatile AtomicReference<ApolloConfigDTO> m_configCache;
 
     /**
      * Constructor.
@@ -204,7 +204,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
                     }
                     exception = statusCodeException;
                 } catch (Throwable ex) {
-                    log.error("loadApolloConfig error",ex);
+                    log.error("loadApolloConfig error", ex);
                 }
 
                 // if force refresh, do normal sleep, if normal config load, do exponential sleep

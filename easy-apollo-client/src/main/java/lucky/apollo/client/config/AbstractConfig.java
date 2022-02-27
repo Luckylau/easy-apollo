@@ -9,7 +9,6 @@ import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.client.build.ApolloInjector;
 import lucky.apollo.client.enums.PropertyChangeType;
-import lucky.apollo.client.exception.ApolloConfigException;
 import lucky.apollo.client.model.ConfigChange;
 import lucky.apollo.client.model.ConfigChangeEvent;
 import lucky.apollo.client.util.ConfigUtil;
@@ -18,7 +17,10 @@ import lucky.apollo.client.util.Parsers;
 import lucky.apollo.common.utils.ApolloThreadFactory;
 
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -26,16 +28,26 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2020/9/19
  */
 @Slf4j
-public abstract class AbstractConfig implements Config{
+public abstract class AbstractConfig implements Config {
 
     private static final ExecutorService m_executorService;
 
+    static {
+        m_executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
+                60L, TimeUnit.SECONDS,
+                new SynchronousQueue<>(),
+                ApolloThreadFactory.create("Config", true));
+    }
+
     private final List<ConfigChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
-
     private final Map<ConfigChangeListener, Set<String>> m_interestedKeys = Maps.newConcurrentMap();
-
     private final ConfigUtil m_configUtil;
-
+    private final Map<String, Cache<String, String[]>> m_arrayCache;
+    private final List<Cache> allCaches;
+    /**
+     * indicate config version
+     */
+    private final AtomicLong m_configVersion;
     private volatile Cache<String, Integer> m_integerCache;
     private volatile Cache<String, Long> m_longCache;
     private volatile Cache<String, Short> m_shortCache;
@@ -45,21 +57,8 @@ public abstract class AbstractConfig implements Config{
     private volatile Cache<String, Boolean> m_booleanCache;
     private volatile Cache<String, Date> m_dateCache;
     private volatile Cache<String, Long> m_durationCache;
-    private final Map<String, Cache<String, String[]>> m_arrayCache;
-    private final List<Cache> allCaches;
-    /**
-     * indicate config version
-     */
-    private final AtomicLong m_configVersion;
 
-    static {
-        m_executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS,
-                new SynchronousQueue<>(),
-                ApolloThreadFactory.create("Config", true));
-    }
-
-    public AbstractConfig(){
+    public AbstractConfig() {
         m_configUtil = ApolloInjector.getInstance(ConfigUtil.class);
         m_configVersion = new AtomicLong();
         m_arrayCache = Maps.newConcurrentMap();
@@ -101,7 +100,7 @@ public abstract class AbstractConfig implements Config{
             return getValueFromCache(key, Functions.TO_INT_FUNCTION, m_integerCache, defaultValue);
         } catch (Throwable ex) {
             log.error("getIntProperty for {} failed, return default value {}, ex : {}", key,
-                            defaultValue, ex);
+                    defaultValue, ex);
         }
         return defaultValue;
     }
@@ -446,7 +445,7 @@ public abstract class AbstractConfig implements Config{
     }
 
     public List<ConfigChange> calcPropertyChanges(String namespace, Properties previous,
-                                           Properties current) {
+                                                  Properties current) {
         if (previous == null) {
             previous = new Properties();
         }
@@ -486,10 +485,6 @@ public abstract class AbstractConfig implements Config{
 
         return changes;
     }
-
-
-
-
 
 
 }

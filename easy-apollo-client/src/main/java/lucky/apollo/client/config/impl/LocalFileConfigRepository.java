@@ -29,8 +29,8 @@ public class LocalFileConfigRepository extends AbstractConfigRepository implemen
 
     private static final String CONFIG_DIR = "/config-cache";
     private final String m_namespace;
-    private File m_baseDir;
     private final ConfigUtil m_configUtil;
+    private File m_baseDir;
     private volatile Properties m_fileProperties;
     private volatile ConfigRepository m_upstream;
 
@@ -126,7 +126,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository implemen
             return true;
         } catch (Throwable ex) {
             log.warn("Sync config from upstream repository {} failed, reason: {}", m_upstream.getClass(),
-                            ExceptionUtil.getDetailMessage(ex));
+                    ExceptionUtil.getDetailMessage(ex));
         }
         return false;
     }
@@ -163,7 +163,6 @@ public class LocalFileConfigRepository extends AbstractConfigRepository implemen
             }
         }
     }
-
 
 
     private Properties loadFromLocalCacheFile(File baseDir, String namespace) throws IOException {
@@ -204,7 +203,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository implemen
 
     @Override
     public Properties getConfig() {
-        if(m_fileProperties == null){
+        if (m_fileProperties == null) {
             sync();
         }
         Properties result = new Properties();
@@ -214,10 +213,10 @@ public class LocalFileConfigRepository extends AbstractConfigRepository implemen
 
     @Override
     public void setUpstreamRepository(ConfigRepository upstreamConfigRepository) {
-        if(upstreamConfigRepository == null){
+        if (upstreamConfigRepository == null) {
             return;
         }
-        if(m_upstream != null){
+        if (m_upstream != null) {
             m_upstream.removeChangeListener(this);
         }
         m_upstream = upstreamConfigRepository;

@@ -28,18 +28,18 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public abstract class AbstractConfigFile implements ConfigFile, RepositoryChangeListener {
     private static ExecutorService m_executorService;
-    protected final ConfigRepository m_configRepository;
-    protected final String m_namespace;
-    protected final AtomicReference<Properties> m_configProperties;
-    private final List<ConfigFileChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
-
-    private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
     static {
         m_executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
                 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), ApolloThreadFactory
                 .create("ConfigFile", true));
     }
+
+    protected final ConfigRepository m_configRepository;
+    protected final String m_namespace;
+    protected final AtomicReference<Properties> m_configProperties;
+    private final List<ConfigFileChangeListener> m_listeners = Lists.newCopyOnWriteArrayList();
+    private volatile ConfigSourceType m_sourceType = ConfigSourceType.NONE;
 
     public AbstractConfigFile(String namespace, ConfigRepository configRepository) {
         m_configRepository = configRepository;

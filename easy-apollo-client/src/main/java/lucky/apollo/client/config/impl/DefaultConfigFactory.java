@@ -2,7 +2,10 @@ package lucky.apollo.client.config.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.client.build.ApolloInjector;
-import lucky.apollo.client.config.*;
+import lucky.apollo.client.config.Config;
+import lucky.apollo.client.config.ConfigFactory;
+import lucky.apollo.client.config.ConfigFile;
+import lucky.apollo.client.config.ConfigRepository;
 import lucky.apollo.client.config.impl.configFile.*;
 import lucky.apollo.client.util.ConfigUtil;
 import lucky.apollo.common.constant.ConfigFileFormat;
@@ -27,7 +30,7 @@ public class DefaultConfigFactory implements ConfigFactory {
 
     @Override
     public ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat) {
-        ConfigRepository configRepository= createLocalConfigRepository(namespace);
+        ConfigRepository configRepository = createLocalConfigRepository(namespace);
         switch (configFileFormat) {
             case Properties:
                 return new PropertiesConfigFile(namespace, configRepository);

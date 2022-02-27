@@ -23,7 +23,6 @@ import lucky.apollo.common.utils.ApolloThreadFactory;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicReference;
@@ -34,13 +33,13 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 @Slf4j
 public class ConfigServiceLocator {
+    private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
+    private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
     private HttpUtil m_httpUtil;
     private ConfigUtil m_configUtil;
     private AtomicReference<List<ServiceDTO>> m_configServices;
     private Type m_responseType;
     private ScheduledExecutorService m_executorService;
-    private static final Joiner.MapJoiner MAP_JOINER = Joiner.on("&").withKeyValueSeparator("=");
-    private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
 
     /**
      * Create a config service locator.
@@ -78,11 +77,6 @@ public class ConfigServiceLocator {
                     tryUpdateConfigServices();
                 }, m_configUtil.getRefreshInterval(), m_configUtil.getRefreshInterval(),
                 m_configUtil.getRefreshIntervalTimeUnit());
-    }
-
-    private void setConfigServices(List<ServiceDTO> services) {
-        m_configServices.set(services);
-        logConfigServices(services);
     }
 
     private void logConfigServices(List<ServiceDTO> serviceDtos) {
@@ -196,6 +190,11 @@ public class ConfigServiceLocator {
         }
 
         return m_configServices.get();
+    }
+
+    private void setConfigServices(List<ServiceDTO> services) {
+        m_configServices.set(services);
+        logConfigServices(services);
     }
 
 
