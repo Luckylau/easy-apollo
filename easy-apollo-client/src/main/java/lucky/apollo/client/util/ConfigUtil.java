@@ -2,13 +2,12 @@ package lucky.apollo.client.util;
 
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.RateLimiter;
+import lombok.extern.slf4j.Slf4j;
 import lucky.apollo.client.foundation.Foundation;
 import lucky.apollo.client.metaservice.MetaDomainConsts;
 import lucky.apollo.common.constant.ConfigConsts;
 import lucky.apollo.common.constant.Env;
 import lucky.apollo.common.utils.EnvUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -17,8 +16,8 @@ import java.util.concurrent.TimeUnit;
  * @Author luckylau
  * @Date 2019/12/17
  */
+@Slf4j
 public class ConfigUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
     private int refreshInterval = 5;
     private TimeUnit refreshIntervalTimeUnit = TimeUnit.MINUTES;
     /**
@@ -97,7 +96,7 @@ public class ConfigUtil {
         if (Strings.isNullOrEmpty(appId)) {
             appId = ConfigConsts.NO_APP_ID_PLACEHOLDER;
             if (warnLogRateLimiter.tryAcquire()) {
-                logger.warn(
+                log.warn(
                         "app.id is not set, please make sure it is set in classpath:/META-INF/app.properties, now apollo will only load public namespace configurations!");
             }
         }
@@ -160,7 +159,7 @@ public class ConfigUtil {
             try {
                 connectTimeout = Integer.parseInt(customizedConnectTimeout);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.connectTimeout is invalid: {}", customizedConnectTimeout);
+                log.error("Config for apollo.connectTimeout is invalid: {}", customizedConnectTimeout);
             }
         }
     }
@@ -175,7 +174,7 @@ public class ConfigUtil {
             try {
                 readTimeout = Integer.parseInt(customizedReadTimeout);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.readTimeout is invalid: {}", customizedReadTimeout);
+                log.error("Config for apollo.readTimeout is invalid: {}", customizedReadTimeout);
             }
         }
     }
@@ -190,7 +189,7 @@ public class ConfigUtil {
             try {
                 refreshInterval = Integer.parseInt(customizedRefreshInterval);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.refreshInterval is invalid: {}", customizedRefreshInterval);
+                log.error("Config for apollo.refreshInterval is invalid: {}", customizedRefreshInterval);
             }
         }
     }
@@ -209,7 +208,7 @@ public class ConfigUtil {
             try {
                 loadConfigQPS = Integer.parseInt(customizedLoadConfigQPS);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.loadConfigQPS is invalid: {}", customizedLoadConfigQPS);
+                log.error("Config for apollo.loadConfigQPS is invalid: {}", customizedLoadConfigQPS);
             }
         }
 
@@ -218,7 +217,7 @@ public class ConfigUtil {
             try {
                 longPollQPS = Integer.parseInt(customizedLongPollQPS);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.longPollQPS is invalid: {}", customizedLongPollQPS);
+                log.error("Config for apollo.longPollQPS is invalid: {}", customizedLongPollQPS);
             }
         }
     }
@@ -283,7 +282,7 @@ public class ConfigUtil {
             try {
                 maxConfigCacheSize = Long.valueOf(customizedConfigCacheSize);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.configCacheSize is invalid: {}", customizedConfigCacheSize);
+                log.error("Config for apollo.configCacheSize is invalid: {}", customizedConfigCacheSize);
             }
         }
     }
@@ -306,7 +305,7 @@ public class ConfigUtil {
             try {
                 longPollingInitialDelayInMills = Long.valueOf(customizedLongPollingInitialDelay);
             } catch (Throwable ex) {
-                logger.error("Config for apollo.longPollingInitialDelayInMills is invalid: {}", customizedLongPollingInitialDelay);
+                log.error("Config for apollo.longPollingInitialDelayInMills is invalid: {}", customizedLongPollingInitialDelay);
             }
         }
     }

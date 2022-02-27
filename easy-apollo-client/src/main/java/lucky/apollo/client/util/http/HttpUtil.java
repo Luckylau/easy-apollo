@@ -41,12 +41,7 @@ public class HttpUtil {
      * @throws ApolloConfigException if any error happened or response code is neither 200 nor 304
      */
     public <T> HttpResponse<T> doGet(HttpRequest httpRequest, final Class<T> responseType) {
-        Function<String, T> convertResponse = new Function<String, T>() {
-            @Override
-            public T apply(String input) {
-                return gson.fromJson(input, responseType);
-            }
-        };
+        Function<String, T> convertResponse = input -> gson.fromJson(input, responseType);
 
         return doGetWithSerializeFunction(httpRequest, convertResponse);
     }
@@ -60,12 +55,7 @@ public class HttpUtil {
      * @throws ApolloConfigException if any error happened or response code is neither 200 nor 304
      */
     public <T> HttpResponse<T> doGet(HttpRequest httpRequest, final Type responseType) {
-        Function<String, T> convertResponse = new Function<String, T>() {
-            @Override
-            public T apply(String input) {
-                return gson.fromJson(input, responseType);
-            }
-        };
+        Function<String, T> convertResponse = input -> gson.fromJson(input, responseType);
 
         return doGetWithSerializeFunction(httpRequest, convertResponse);
     }

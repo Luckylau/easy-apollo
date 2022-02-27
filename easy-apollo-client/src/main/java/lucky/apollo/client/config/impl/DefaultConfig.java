@@ -9,6 +9,7 @@ import lucky.apollo.client.config.RepositoryChangeListener;
 import lucky.apollo.client.constant.ConfigSourceType;
 import lucky.apollo.client.enums.PropertyChangeType;
 import lucky.apollo.client.model.ConfigChange;
+import lucky.apollo.client.model.ConfigChangeEvent;
 import lucky.apollo.client.util.ExceptionUtil;
 import lucky.apollo.common.utils.ClassLoaderUtil;
 
@@ -155,6 +156,13 @@ public class DefaultConfig extends AbstractConfig implements RepositoryChangeLis
         newConfigProperties.putAll(newProperties);
 
         Map<String, ConfigChange> actualChanges = updateAndCalcConfigChanges(newConfigProperties, sourceType);
+
+        //check double checked result
+        if (actualChanges.isEmpty()) {
+            return;
+        }
+
+        this.fireConfigChange(new ConfigChangeEvent(m_namespace, actualChanges));
 
     }
 

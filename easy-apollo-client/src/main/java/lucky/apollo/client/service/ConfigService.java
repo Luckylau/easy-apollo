@@ -1,5 +1,6 @@
 package lucky.apollo.client.service;
 
+import lucky.apollo.client.build.ApolloInjector;
 import lucky.apollo.client.config.*;
 import lucky.apollo.common.constant.ConfigConsts;
 import lucky.apollo.common.constant.ConfigFileFormat;

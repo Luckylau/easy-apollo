@@ -19,4 +19,6 @@ public class ConfigConsts {
 
     public static final String APOLLO_CLUSTER_KEY = "apollo.cluster";
 
+    public static final String APOLLO_META_KEY = "apollo.meta";
+
 }

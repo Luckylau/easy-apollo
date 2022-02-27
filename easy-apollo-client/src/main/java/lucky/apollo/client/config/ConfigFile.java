@@ -50,12 +50,12 @@ public interface ConfigFile {
      * @param listener the specific config change listener to remove
      * @return true if the specific config change listener is found and removed
      */
-    public boolean removeChangeListener(ConfigChangeListener listener);
+    boolean removeChangeListener(ConfigChangeListener listener);
 
     /**
      * Return the config's source type, i.e. where is the config loaded from
      *
      * @return the config's source type
      */
-    public ConfigSourceType getSourceType();
+    ConfigSourceType getSourceType();
 }
