@@ -18,11 +18,7 @@ public enum ConfigFileFormat {
     /**
      * yaml格式
      */
-    YML("yml"), YAML("yaml"),
-    /**
-     * txt格式
-     */
-    TXT("txt");
+    YML("yml"), YAML("yaml");
 
     private String value;
 
@@ -45,8 +41,6 @@ public enum ConfigFileFormat {
                 return YML;
             case "yaml":
                 return YAML;
-            case "txt":
-                return TXT;
             default:
                 throw new IllegalArgumentException(value + " can not map enum");
         }

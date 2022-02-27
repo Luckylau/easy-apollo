@@ -1,15 +1,55 @@
 package lucky.apollo.client.config.impl;
 
+import com.google.common.collect.Maps;
+import lucky.apollo.client.build.ApolloInjector;
 import lucky.apollo.client.config.ConfigFactory;
 import lucky.apollo.client.config.ConfigFactoryManager;
+import lucky.apollo.client.config.ConfigRegistry;
+
+import java.util.Map;
 
 /**
  * @Author luckylau
  * @Date 2019/12/13
  */
 public class DefaultConfigFactoryManager implements ConfigFactoryManager {
+    private ConfigRegistry m_registry;
+
+    private Map<String, ConfigFactory> m_factories = Maps.newConcurrentMap();
+
+    public DefaultConfigFactoryManager() {
+        m_registry = ApolloInjector.getInstance(ConfigRegistry.class);
+    }
+
     @Override
     public ConfigFactory getFactory(String namespace) {
-        return null;
+        // step 1: check hacked factory
+        ConfigFactory factory = m_registry.getFactory(namespace);
+
+        if (factory != null) {
+            return factory;
+        }
+
+        // step 2: check cache
+        factory = m_factories.get(namespace);
+
+        if (factory != null) {
+            return factory;
+        }
+
+        // step 3: check declared config factory
+        factory = ApolloInjector.getInstance(ConfigFactory.class, namespace);
+
+        if (factory != null) {
+            return factory;
+        }
+
+        // step 4: check default config factory
+        factory = ApolloInjector.getInstance(ConfigFactory.class);
+
+        m_factories.put(namespace, factory);
+
+        // factory should not be null
+        return factory;
     }
 }

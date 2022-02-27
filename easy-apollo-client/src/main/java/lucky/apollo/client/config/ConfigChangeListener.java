@@ -12,5 +12,5 @@ public interface ConfigChangeListener {
      *
      * @param changeEvent the event for this change
      */
-    public void onChange(ConfigChangeEvent changeEvent);
+    void onChange(ConfigChangeEvent changeEvent);
 }
