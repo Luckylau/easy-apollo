@@ -14,10 +14,10 @@
     <module>easy-apollo-distribution</module>
     <module>easy-apollo-adminservice</module>
     <module>easy-apollo-core</module>
-      <module>easy-apollo-metaservice</module>
-      <module>easy-apollo-configservice</module>
-      <module>easy-apollo-client</module>
-      <module>easy-apollo-openapi</module>
+    <module>easy-apollo-metaservice</module>
+    <module>easy-apollo-configservice</module>
+    <module>easy-apollo-client</module>
+    <module>easy-apollo-openapi</module>
   </modules>
   <packaging>pom</packaging>
 
