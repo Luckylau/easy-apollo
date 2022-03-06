@@ -1,0 +1,4 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+lucky.apollo.client.spring.boot.ApolloAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=\
+lucky.apollo.client.spring.boot.ApolloApplicationContextInitializer
