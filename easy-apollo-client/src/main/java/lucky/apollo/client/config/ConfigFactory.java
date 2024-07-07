@@ -18,7 +18,8 @@ public interface ConfigFactory {
     /**
      * Create the config file instance for the namespace
      *
-     * @param namespace the namespace
+     * @param configFileFormat
+     * @param namespace        the namespace
      * @return the newly created config file instance
      */
     ConfigFile createConfigFile(String namespace, ConfigFileFormat configFileFormat);
